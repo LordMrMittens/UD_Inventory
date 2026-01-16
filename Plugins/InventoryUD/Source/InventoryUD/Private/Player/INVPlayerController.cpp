@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Items/Components/INV_ItemComponent.h"
 #include "Interaction/INV_Highlightable.h"
+#include "InventoryManagement/Components/INV_InventoryComponent.h"
+
 
 AINVPlayerController::AINVPlayerController()
 {
@@ -30,6 +32,7 @@ void AINVPlayerController::BeginPlay()
 	if (IsValid(Subsystem)) {
 		Subsystem->AddMappingContext(DefaultIMC,0);
 	}
+	InventoryComponent = FindComponentByClass<UINV_InventoryComponent>();
 	CreateHUDWidget();
 }
 
@@ -38,6 +41,7 @@ void AINVPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Started, this, &AINVPlayerController::PrimaryInteract);
+	EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &AINVPlayerController::ToggleInventoryMenu);
 }
 
 void AINVPlayerController::PrimaryInteract()
@@ -94,4 +98,10 @@ void AINVPlayerController::TraceForItem()
 			IINV_Highlightable::Execute_UnHighlight(Highlightable);
 		}
 	}
+}
+
+void AINVPlayerController::ToggleInventoryMenu()
+{
+	if (!InventoryComponent.IsValid()) return;
+	InventoryComponent->ToggleInventoryMenu();
 }
