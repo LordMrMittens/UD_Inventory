@@ -6,7 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "INV_InventoryComponent.generated.h"
 
+
 class UINV_InventoryBase;
+class UINV_InventoryItem;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChange, UINV_InventoryItem*, Item);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class INVENTORYUD_API UINV_InventoryComponent : public UActorComponent
@@ -19,6 +23,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
+
+
+	FInventoryItemChange OnItemAdded;
+	FInventoryItemChange OnItemRemoved; 
 
 protected:
 	// Called when the game starts

@@ -7,6 +7,7 @@
 
 class UINV_InventoryItem;
 class UINV_InventoryComponent;
+class UINV_ItemComponent;
 
 
 // A single entry in an inventory
@@ -49,7 +50,7 @@ public:
 	{
 		return FastArrayDeltaSerialize<FINV_InventoryEntry, FINV_InventoryFastArray>(Entries, DeltaParams, *this);
 	}
-	UINV_InventoryItem* AddEntry(UINV_InventoryComponent* ItemComponent);
+	UINV_InventoryItem* AddEntry(UINV_ItemComponent* ItemComponent);
 	UINV_InventoryItem* AddEntry(UINV_InventoryItem* Item);
 	void RemoveEntry(UINV_InventoryItem* Item);
 
