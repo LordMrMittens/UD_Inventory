@@ -11,6 +11,11 @@ UINV_InventoryComponent::UINV_InventoryComponent()
 	// ...
 }
 
+void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
+{
+	OnNoRoomInInventory.Broadcast();
+}
+
 
 // Called when the game starts
 void UINV_InventoryComponent::BeginPlay()

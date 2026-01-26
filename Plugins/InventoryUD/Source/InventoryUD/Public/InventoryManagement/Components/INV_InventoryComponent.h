@@ -9,8 +9,10 @@
 
 class UINV_InventoryBase;
 class UINV_InventoryItem;
+class UINV_ItemComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChange, UINV_InventoryItem*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class INVENTORYUD_API UINV_InventoryComponent : public UActorComponent
@@ -21,12 +23,16 @@ public:
 
 	UINV_InventoryComponent();
 
+	UFUNCTION(BlueprintCallable,BlueprintAuthorityOnly ,Category = "Inventory")
+	void TryAddItem(UINV_ItemComponent* ItemComponent);
+
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
 
 
 	FInventoryItemChange OnItemAdded;
 	FInventoryItemChange OnItemRemoved; 
+	FNoRoomInInventory OnNoRoomInInventory;
 
 protected:
 	// Called when the game starts
