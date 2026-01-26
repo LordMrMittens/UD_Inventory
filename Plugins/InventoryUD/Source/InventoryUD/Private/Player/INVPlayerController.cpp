@@ -50,6 +50,7 @@ void AINVPlayerController::PrimaryInteract()
 	UINV_ItemComponent* ItemComponent = CurrentActor->FindComponentByClass<UINV_ItemComponent>();
 	if (!IsValid(ItemComponent) || !InventoryComponent.IsValid()) return;
 	InventoryComponent->TryAddItem(ItemComponent);
+	
 
 }
 

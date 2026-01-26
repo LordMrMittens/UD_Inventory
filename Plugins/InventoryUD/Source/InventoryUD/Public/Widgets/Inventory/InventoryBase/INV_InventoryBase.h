@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Types/INV_GridTypes.h"
 #include "INV_InventoryBase.generated.h"
 
+class UINV_ItemComponent;
 /**
  * 
  */
@@ -13,5 +15,8 @@ UCLASS()
 class INVENTORYUD_API UINV_InventoryBase : public UUserWidget
 {
 	GENERATED_BODY()
+public:
+	virtual FINV_SlotAvailabilityResult HasRoomForItem(UINV_ItemComponent* ItemComponent) const { return FINV_SlotAvailabilityResult(); }
+	
 	
 };

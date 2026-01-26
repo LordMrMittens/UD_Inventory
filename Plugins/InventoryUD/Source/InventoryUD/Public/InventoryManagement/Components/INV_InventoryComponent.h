@@ -26,6 +26,12 @@ public:
 	UFUNCTION(BlueprintCallable,BlueprintAuthorityOnly ,Category = "Inventory")
 	void TryAddItem(UINV_ItemComponent* ItemComponent);
 
+	UFUNCTION(Server,Reliable)
+	void Server_AddNewItem(UINV_ItemComponent* ItemComponent, int32 StackCount);
+
+	UFUNCTION(Server, Reliable)
+	void Server_AddStacksToItem(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
+
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
 

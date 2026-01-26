@@ -13,9 +13,32 @@ UINV_InventoryComponent::UINV_InventoryComponent()
 
 void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 {
-	OnNoRoomInInventory.Broadcast();
-}
+	FINV_SlotAvailabilityResult Result = InventoryMenu->HasRoomForItem(ItemComponent);
+	
+	if(Result.TotalRoomToFill ==0)
+	{
+		OnNoRoomInInventory.Broadcast();
+		return;
+	}
 
+	if (Result.Item.IsValid() && Result.bStackable) {
+		//Add stacks
+		Server_AddStacksToItem(ItemComponent, Result.TotalRoomToFill, Result.Remainder);
+	}
+	else if (Result.TotalRoomToFill > 0)
+	{
+		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0);
+		//this item doesnt exist in the inventory, creat a new one and update slots
+	}
+}
+void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount) 
+{
+
+}
+void UINV_InventoryComponent::Server_AddStacksToItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
+{
+
+}
 
 // Called when the game starts
 void UINV_InventoryComponent::BeginPlay()
