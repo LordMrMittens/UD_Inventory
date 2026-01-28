@@ -9,6 +9,8 @@
 
 class UINV_GridSlot;
 class UCanvasPanel;
+class UINV_InventoryComponent;
+class UINV_InventoryItem;
 /**
  * 
  */
@@ -20,10 +22,16 @@ class INVENTORYUD_API UINV_InventoryGrid : public UUserWidget
 public:
 	virtual void NativeOnInitialized() override;
 
+	UFUNCTION()
+	void AddItem(UINV_InventoryItem* Item);
 
 private:
 
 	void ConstructGrid();
+
+	bool MatchesCategory(const UINV_InventoryItem* Item) const;
+
+	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Inventory")
 	EINV_ItemCategory ItemCategory;

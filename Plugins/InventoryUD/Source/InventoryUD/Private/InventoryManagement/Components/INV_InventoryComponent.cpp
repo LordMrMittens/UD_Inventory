@@ -5,7 +5,7 @@
 #include "Widgets/Inventory/InventoryBase/INV_InventoryBase.h"
 #include "Net/UnrealNetwork.h"
 
-UINV_InventoryComponent::UINV_InventoryComponent()
+UINV_InventoryComponent::UINV_InventoryComponent() : InventoryList(this)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
@@ -43,6 +43,10 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount) 
 {
     UINV_InventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
+
+	if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone) {
+		OnItemAdded.Broadcast(NewItem);
+	}
 	//destroy owning actor TODO
 }
 
