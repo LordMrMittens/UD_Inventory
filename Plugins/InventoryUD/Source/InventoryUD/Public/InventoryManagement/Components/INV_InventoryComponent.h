@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "InventoryManagement\FastArray\INV_FastArray.h"
 #include "INV_InventoryComponent.generated.h"
 
 
@@ -23,6 +24,8 @@ public:
 
 	UINV_InventoryComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION(BlueprintCallable,BlueprintAuthorityOnly ,Category = "Inventory")
 	void TryAddItem(UINV_ItemComponent* ItemComponent);
 
@@ -34,6 +37,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
+
+	void AddRepSubObject(UObject* SubObj);
 
 
 	FInventoryItemChange OnItemAdded;
@@ -48,6 +53,10 @@ private:
 
 
 	void ConstructInventory();
+
+	UPROPERTY(Replicated)
+	FINV_InventoryFastArray InventoryList;
+
 	void OpenInventoryMenu();
 	void CloseInventoryMenu();
 

@@ -2,6 +2,7 @@
 
 
 #include "Items/Components/INV_ItemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 UINV_ItemComponent::UINV_ItemComponent()
 {
@@ -9,6 +10,12 @@ UINV_ItemComponent::UINV_ItemComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 	//initialise default values
 	PickupMessage = "E - Pickup";
+}
+
+void UINV_ItemComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, ItemManifest);
 }
 
 

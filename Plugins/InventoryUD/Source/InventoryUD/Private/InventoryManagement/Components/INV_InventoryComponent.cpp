@@ -3,12 +3,21 @@
 
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "Widgets/Inventory/InventoryBase/INV_InventoryBase.h"
+#include "Net/UnrealNetwork.h"
 
 UINV_InventoryComponent::UINV_InventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
+	SetIsReplicatedByDefault(true);
+	bReplicateUsingRegisteredSubObjectList = true;
+	bInventoryMenuOpen = false;
 	// ...
+}
+
+void UINV_InventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, InventoryList);
 }
 
 void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
@@ -33,8 +42,10 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 }
 void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount) 
 {
-
+    UINV_InventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
+	//destroy owning actor TODO
 }
+
 void UINV_InventoryComponent::Server_AddStacksToItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
 
@@ -62,6 +73,14 @@ void UINV_InventoryComponent::ConstructInventory()
 void UINV_InventoryComponent::ToggleInventoryMenu()
 {
 	bInventoryMenuOpen ? CloseInventoryMenu() : OpenInventoryMenu();
+}
+
+void UINV_InventoryComponent::AddRepSubObject(UObject* SubObj)
+{
+	if(IsUsingRegisteredSubObjectList() && IsReadyForReplication() && IsValid(SubObj))
+	{
+		AddReplicatedSubObject(SubObj);
+	}
 }
 
 void UINV_InventoryComponent::OpenInventoryMenu()

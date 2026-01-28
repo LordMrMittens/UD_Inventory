@@ -37,7 +37,18 @@ void FINV_InventoryFastArray::PostReplicatedAdd(const TArrayView<int32> AddedInd
 UINV_InventoryItem* FINV_InventoryFastArray::AddEntry(UINV_ItemComponent* ItemComponent)
 {
 	//TODO once item component is more complete
-	return nullptr;
+	check(OwnerComponent);
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+
+	UINV_InventoryComponent* IC = Cast<UINV_InventoryComponent>(OwnerComponent);
+	if (!IsValid(IC)) return nullptr;
+
+	FINV_InventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+	NewEntry.Item = ItemComponent->GetItemManifest().Manifest(OwningActor);
+	IC->AddRepSubObject(NewEntry.Item);
+	MarkItemDirty(NewEntry);
+	return NewEntry.Item;
 }
 
 UINV_InventoryItem* FINV_InventoryFastArray::AddEntry(UINV_InventoryItem* Item)
