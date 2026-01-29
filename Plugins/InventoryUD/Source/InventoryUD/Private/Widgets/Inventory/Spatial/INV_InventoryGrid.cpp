@@ -6,6 +6,8 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Items/INV_InventoryItem.h"
+#include "Items/Components/INV_ItemComponent.h"
+#include "Items/Manifest/INV_ItemManifest.h"
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "InventoryManagement/Utils/INV_InventoryStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -23,7 +25,25 @@ void UINV_InventoryGrid::AddItem(UINV_InventoryItem* Item)
 {
 	if (!MatchesCategory(Item)) return;
 
-	UE_LOG(LogTemp, Display, TEXT("Inventory grid added item"));
+	FINV_SlotAvailabilityResult Result = HasRoomForItem(Item);
+}
+
+FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)
+{
+
+	return HasRoomForItem(ItemComponent->GetItemManifest());
+}
+
+FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_InventoryItem* Item)
+{
+	return HasRoomForItem(Item->GetItemManifest());
+}
+
+FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemManifest& Manifest)
+{
+	FINV_SlotAvailabilityResult Result;
+	Result.TotalRoomToFill = 1;
+	return Result;
 }
 
 void UINV_InventoryGrid::ConstructGrid()

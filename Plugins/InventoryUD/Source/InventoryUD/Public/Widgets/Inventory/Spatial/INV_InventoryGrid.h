@@ -11,6 +11,8 @@ class UINV_GridSlot;
 class UCanvasPanel;
 class UINV_InventoryComponent;
 class UINV_InventoryItem;
+class UINV_ItemComponent;
+struct FINV_ItemManifest;
 /**
  * 
  */
@@ -25,12 +27,16 @@ public:
 	UFUNCTION()
 	void AddItem(UINV_InventoryItem* Item);
 
+	FINV_SlotAvailabilityResult HasRoomForItem(const UINV_ItemComponent* ItemComponent);
+
 private:
 
 	void ConstructGrid();
 
 	bool MatchesCategory(const UINV_InventoryItem* Item) const;
 
+	FINV_SlotAvailabilityResult HasRoomForItem(const UINV_InventoryItem* Item);
+	FINV_SlotAvailabilityResult HasRoomForItem(const FINV_ItemManifest& Manifest);
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Inventory")

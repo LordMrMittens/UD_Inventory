@@ -7,6 +7,7 @@
 #include "INV_InventoryStatics.generated.h"
 
 class UINV_InventoryComponent;
+class UINV_ItemComponent;
 /**
  * 
  */
@@ -19,5 +20,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static UINV_InventoryComponent* GetInventoryComponent(const APlayerController* PlayerController);
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static EINV_ItemCategory GetCategoryFromItemComponent(const UINV_ItemComponent* ItemComponent);
 	
 };
