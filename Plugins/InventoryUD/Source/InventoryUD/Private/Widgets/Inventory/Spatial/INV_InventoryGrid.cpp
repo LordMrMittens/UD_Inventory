@@ -26,6 +26,15 @@ void UINV_InventoryGrid::AddItem(UINV_InventoryItem* Item)
 	if (!MatchesCategory(Item)) return;
 
 	FINV_SlotAvailabilityResult Result = HasRoomForItem(Item);
+	AddItemToIndices(Result, Item);
+}
+
+void UINV_InventoryGrid::AddItemToIndices(const FINV_SlotAvailabilityResult& AvailabilityResult, UINV_InventoryItem* NewItem)
+{
+	// TODO Get Fragments to know spaces, icons etc.
+
+	//Create item widget
+	//store item widget somewhere
 }
 
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)
@@ -43,8 +52,15 @@ FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemMa
 {
 	FINV_SlotAvailabilityResult Result;
 	Result.TotalRoomToFill = 1;
+
+	FINV_SlotAvailability SlotAvailability;
+	SlotAvailability.AmountToFill = 1;
+	SlotAvailability.Index = 0;
+	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability));
+
 	return Result;
 }
+
 
 void UINV_InventoryGrid::ConstructGrid()
 {

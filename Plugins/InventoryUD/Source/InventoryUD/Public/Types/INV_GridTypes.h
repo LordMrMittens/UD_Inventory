@@ -13,11 +13,11 @@ enum class  EINV_ItemCategory : uint8
 	None
 };
 USTRUCT()
-struct FINV_StructAvailability {
+struct FINV_SlotAvailability {
 	GENERATED_BODY()
 
-	FINV_StructAvailability() {}
-	FINV_StructAvailability(int32 ItemIndex, int32 Room, bool bHasItem) : Index(ItemIndex), AmountToFill(Room), bItemAtIndex(bHasItem) {}
+	FINV_SlotAvailability() {}
+	FINV_SlotAvailability(int32 ItemIndex, int32 Room, bool bHasItem) : Index(ItemIndex), AmountToFill(Room), bItemAtIndex(bHasItem) {}
 
 	int32 Index{ INDEX_NONE };
 	int32 AmountToFill{ 0 };
@@ -37,5 +37,5 @@ struct FINV_SlotAvailabilityResult {
 	int32 TotalRoomToFill{ 0 };
 	int32 Remainder{ 0 };
 
-	TArray<FINV_StructAvailability> StructAvailabilities;
+	TArray<FINV_SlotAvailability> SlotAvailabilities;
 };

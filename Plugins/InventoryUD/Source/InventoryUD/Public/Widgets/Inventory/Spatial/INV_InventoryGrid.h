@@ -37,6 +37,9 @@ private:
 
 	FINV_SlotAvailabilityResult HasRoomForItem(const UINV_InventoryItem* Item);
 	FINV_SlotAvailabilityResult HasRoomForItem(const FINV_ItemManifest& Manifest);
+	void AddItemToIndices(const FINV_SlotAvailabilityResult& AvailabilityResult, UINV_InventoryItem* NewItem);
+
+
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Inventory")
