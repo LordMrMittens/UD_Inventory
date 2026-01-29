@@ -11,6 +11,7 @@
 
 
 class UINV_InventoryItem;
+struct FINV_ItemFragment;
 /**
  * 
  */
@@ -21,9 +22,12 @@ struct INVENTORYUD_API FINV_ItemManifest
 
 private:
 
+	UPROPERTY(EditAnywhere, Category = "Inventory", meta = (ExcludeBaseStruct))
+	TArray<TInstancedStruct<FINV_ItemFragment>> ItemFragments;
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	EINV_ItemCategory ItemCategory{ EINV_ItemCategory::None };
+
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	FGameplayTag ItemType;
 
