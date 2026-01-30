@@ -8,6 +8,8 @@
 #include "Items/INV_InventoryItem.h"
 #include "Items/Components/INV_ItemComponent.h"
 #include "Items/Manifest/INV_ItemManifest.h"
+#include "Items/Fragments/INV_ItemFragment.h"
+#include "Items/Fragments/INV_FragmentTags.h"
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "InventoryManagement/Utils/INV_InventoryStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -31,6 +33,9 @@ void UINV_InventoryGrid::AddItem(UINV_InventoryItem* Item)
 
 void UINV_InventoryGrid::AddItemToIndices(const FINV_SlotAvailabilityResult& AvailabilityResult, UINV_InventoryItem* NewItem)
 {
+	const FINV_GridFragment* GridFragment = GetFragment<FINV_GridFragment>(NewItem, Fragments::Grid);
+	const FINV_ImageFragment* IconFragment = GetFragment<FINV_ImageFragment>(NewItem, Fragments::Icon);
+	if (!GridFragment || !IconFragment) return;
 	// TODO Get Fragments to know spaces, icons etc.
 
 	//Create item widget

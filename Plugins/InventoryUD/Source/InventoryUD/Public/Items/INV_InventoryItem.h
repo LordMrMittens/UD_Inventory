@@ -29,3 +29,12 @@ private:
 
 
 };
+
+template <typename FragmentType>
+const FragmentType* GetFragment(const UINV_InventoryItem* Item, const FGameplayTag& Tag)
+{
+	if (!IsValid(Item))  return nullptr;
+
+	const FINV_ItemManifest& Manifest = Item->GetItemManifest();
+	return Manifest.GetFragmentOfTypeWithTag<FragmentType>(Tag);
+};
