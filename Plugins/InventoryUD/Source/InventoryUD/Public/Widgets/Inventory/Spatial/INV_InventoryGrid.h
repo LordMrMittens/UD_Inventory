@@ -12,14 +12,19 @@ class UCanvasPanel;
 class UINV_InventoryComponent;
 class UINV_InventoryItem;
 class UINV_ItemComponent;
+class UINV_SlottedItem;
 struct FINV_ItemManifest;
-/**
- * 
- */
+struct FINV_GridFragment;
+struct FINV_ImageFragment;
+
+
+
 UCLASS()
 class INVENTORYUD_API UINV_InventoryGrid : public UUserWidget
 {
+
 	GENERATED_BODY()
+
 
 public:
 	virtual void NativeOnInitialized() override;
@@ -38,7 +43,15 @@ private:
 	FINV_SlotAvailabilityResult HasRoomForItem(const UINV_InventoryItem* Item);
 	FINV_SlotAvailabilityResult HasRoomForItem(const FINV_ItemManifest& Manifest);
 	void AddItemToIndices(const FINV_SlotAvailabilityResult& AvailabilityResult, UINV_InventoryItem* NewItem);
-
+	void AddItemAtIndex(UINV_InventoryItem* Item, const int32 Index, const bool bStackable, const int32 StackAmount);
+	UINV_SlottedItem* CreateSlottedItem(UINV_InventoryItem* Item, 
+		const bool bStackable, 
+		const int32 StackAmount, 
+		const FINV_GridFragment* GridFragment, 
+		const FINV_ImageFragment* ImageFragment, 
+		const int32 Index);
+	FVector2D GetDrawSize(const FINV_GridFragment* GridFragment) const;
+	void SetSlottedItemImage(const UINV_SlottedItem* SlottedItem, const FINV_GridFragment* GridFragment, const FINV_ImageFragment* ImageFragment) const;
 
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
@@ -53,6 +66,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	TSubclassOf<UINV_SlottedItem> SlottedItemClass;
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 Rows;

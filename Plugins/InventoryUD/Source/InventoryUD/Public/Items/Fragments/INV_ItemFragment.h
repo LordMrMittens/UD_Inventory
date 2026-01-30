@@ -40,10 +40,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	float GridPadding{ 0.f };
 public:
-	FIntPoint GetGridSize() { return GridSize; }
-	void SetGridSize(FIntPoint Size) { GridSize = Size; }
-	float GetGridPadding() { return GridPadding; }
-	void SetGridPadding(float Padding) { GridPadding = Padding; }
+
+	FIntPoint GetGridSize() const { return GridSize; }
+	void SetGridSize(const FIntPoint Size) { GridSize = Size; }
+	float GetGridPadding() const { return GridPadding; }
+	void SetGridPadding(const float Padding) { GridPadding = Padding; }
 
 };
 
@@ -58,6 +59,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	FVector2D IconDimensions{ 44.f,44.f };
 public:
-	UTexture2D* GetIcon() { return Icon; }
+	UTexture2D* GetIcon() const { return Icon; }
 
 };
