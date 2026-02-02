@@ -55,7 +55,7 @@ private:
 
 	void AddSlottedItemToCanvas(const int32 Index, const FINV_GridFragment* GridFragment, UINV_SlottedItem* SlottedItem) const;
 
-	void UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index);
+	void UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index, bool bStackableItem, const int32 StackAmount);
 
 	FVector2D GetDrawSize(const FINV_GridFragment* GridFragment) const;
 

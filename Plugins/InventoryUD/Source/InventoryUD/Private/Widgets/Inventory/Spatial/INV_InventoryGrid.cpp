@@ -35,10 +35,10 @@ void UINV_InventoryGrid::AddItem(UINV_InventoryItem* Item)
 
 void UINV_InventoryGrid::AddItemToIndices(const FINV_SlotAvailabilityResult& AvailabilityResult, UINV_InventoryItem* NewItem)
 {
-	for(const auto& Availability : AvailabilityResult.SlotAvailabilities)
+	for (const auto& Availability : AvailabilityResult.SlotAvailabilities)
 	{
 		AddItemAtIndex(NewItem, Availability.Index, AvailabilityResult.bStackable, Availability.AmountToFill);
-		UpdateGridSlots(NewItem, Availability.Index);
+		UpdateGridSlots(NewItem, Availability.Index, AvailabilityResult.bStackable, Availability.AmountToFill);
 	}
 }
 
@@ -71,22 +71,31 @@ void UINV_InventoryGrid::AddSlottedItemToCanvas(const int32 Index, const FINV_Gr
 	CanvasPanel->AddChild(SlottedItem);
 	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(SlottedItem);
 	CanvasSlot->SetSize(GetDrawSize(GridFragment));
-	const FVector2D DrawPos = UINV_WidgetUtils::GetPositionFromIndex(Index, Columns)*TileSize;
+	const FVector2D DrawPos = UINV_WidgetUtils::GetPositionFromIndex(Index, Columns) * TileSize;
 	const FVector2D DrawPosWithPadding = DrawPos + FVector2D(GridFragment->GetGridPadding());
 	CanvasSlot->SetPosition(DrawPosWithPadding);
 }
 
-void UINV_InventoryGrid::UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index)
+void UINV_InventoryGrid::UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index, bool bStackableItem, const int32 StackAmount)
 {
 	check(GridSlots.IsValidIndex(Index));
+
+	if (bStackableItem) {
+		GridSlots[Index]->SetStackCount(StackAmount);
+	}
+
+
 	const FINV_GridFragment* GridFragment = GetFragment<FINV_GridFragment>(NewItem, Fragments::Grid);
 	if (!GridFragment) return;
 	GridFragment->GetGridSize();
 	const FIntPoint Dimensions = GridFragment ? GridFragment->GetGridSize() : FIntPoint(1, 1);
 
-	UINV_InventoryStatics::ForEach2D(GridSlots, Index, Dimensions, Columns, [](UINV_GridSlot* GridSlot)
+	UINV_InventoryStatics::ForEach2D(GridSlots, Index, Dimensions, Columns, [&](UINV_GridSlot* GridSlot)
 		{
+			GridSlot->SetInventoryItem(NewItem);
+			GridSlot->SetUpperLeftIndex(Index);
 			GridSlot->SetOccupiedTexture();
+			GridSlot->SetIsAvailable(false);
 		});
 
 }
@@ -153,7 +162,7 @@ void UINV_InventoryGrid::ConstructGrid()
 			const FIntPoint TilePosition(i, j);
 			GridSlot->SetTileIndex(UINV_WidgetUtils::GetIndexFromPosition(TilePosition, Columns));
 			UCanvasPanelSlot* GridCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(GridSlot);
-			GridCPS->SetSize(FVector2D(TileSize,TileSize));
+			GridCPS->SetSize(FVector2D(TileSize, TileSize));
 			GridCPS->SetPosition(FVector2D(TilePosition * TileSize));
 			GridSlots.Add(GridSlot);
 		}
