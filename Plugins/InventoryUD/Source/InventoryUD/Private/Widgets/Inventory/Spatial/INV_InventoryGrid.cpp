@@ -75,9 +75,15 @@ void UINV_InventoryGrid::AddSlottedItemToCanvas(const int32 Index, const FINV_Gr
 void UINV_InventoryGrid::UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index)
 {
 	check(GridSlots.IsValidIndex(Index));
+	const FINV_GridFragment* GridFragment = GetFragment<FINV_GridFragment>(NewItem, Fragments::Grid);
+	if (!GridFragment) return;
+	GridFragment->GetGridSize();
+	const FIntPoint Dimensions = GridFragment ? GridFragment->GetGridSize() : FIntPoint(1, 1);
 
-	UINV_GridSlot* GridSlot = GridSlots[Index];
-	GridSlot->SetOccupiedTexture();
+	UINV_InventoryStatics::ForEach2D(GridSlots, Index, Dimensions, Columns, [](UINV_GridSlot* GridSlot)
+		{
+			GridSlot->SetOccupiedTexture();
+		});
 
 }
 
