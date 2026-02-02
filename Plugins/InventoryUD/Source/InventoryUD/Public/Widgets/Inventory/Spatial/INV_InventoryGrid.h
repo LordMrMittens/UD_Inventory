@@ -55,6 +55,8 @@ private:
 
 	void AddSlottedItemToCanvas(const int32 Index, const FINV_GridFragment* GridFragment, UINV_SlottedItem* SlottedItem) const;
 
+	void UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index);
+
 	FVector2D GetDrawSize(const FINV_GridFragment* GridFragment) const;
 
 	void SetSlottedItemImage(const UINV_SlottedItem* SlottedItem, const FINV_GridFragment* GridFragment, const FINV_ImageFragment* ImageFragment) const;
