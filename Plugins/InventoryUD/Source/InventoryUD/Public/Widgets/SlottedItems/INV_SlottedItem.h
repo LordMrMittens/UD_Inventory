@@ -8,6 +8,7 @@
 
 class UINV_InventoryItem;
 class UImage;
+class UTextBlock;
 /**
  * 
  */
@@ -19,14 +20,23 @@ public:
 
 	void SetImageBrush(const FSlateBrush& Brush) const;
 	void SetInventoryItem(UINV_InventoryItem* Item);
+	void UpdateStackCount(int32 StackCount);
 
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Image_Icon;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr <UTextBlock> Text_StackCount;
+
 	int32 GridIndex;
+
 	FIntPoint GridDimensions;
+
 	TWeakObjectPtr<UINV_InventoryItem> InventoryItem;
+
 	bool bIsStackable{ false };
+
 public:
 
 	void SetIsStackable( bool bStackable) { bIsStackable = bStackable; }

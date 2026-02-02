@@ -59,6 +59,10 @@ UINV_SlottedItem* UINV_InventoryGrid::CreateSlottedItem(UINV_InventoryItem* Item
 
 	SetSlottedItemImage(SlottedItem, GridFragment, ImageFragment);
 	SlottedItem->SetGridIndex(Index);
+	SlottedItem->SetIsStackable(bStackable);
+	const int32 StackUpdateAmount = bStackable ? StackAmount : 0;
+	SlottedItem->UpdateStackCount(StackUpdateAmount);
+
 	return SlottedItem;
 }
 
@@ -120,12 +124,18 @@ FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_Invent
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemManifest& Manifest)
 {
 	FINV_SlotAvailabilityResult Result;
-	Result.TotalRoomToFill = 1;
+	Result.TotalRoomToFill = 7;
+	Result.bStackable = true;
 
 	FINV_SlotAvailability SlotAvailability;
-	SlotAvailability.AmountToFill = 1;
+	SlotAvailability.AmountToFill = 2;
 	SlotAvailability.Index = 0;
 	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability));
+
+	FINV_SlotAvailability SlotAvailability2;
+	SlotAvailability2.AmountToFill = 5;
+	SlotAvailability2.Index = 1;
+	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability2));
 
 	return Result;
 }

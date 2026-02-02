@@ -62,3 +62,21 @@ public:
 	UTexture2D* GetIcon() const { return Icon; }
 
 };
+
+USTRUCT(BlueprintType)
+struct FINV_StackableFragment : public FINV_ItemFragment
+{
+	GENERATED_BODY()
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 MaxStackSize{ 10 };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 StackCount{ 1 };
+
+public:
+	
+	int32 GetMaxStackSize() { return MaxStackSize; }
+	int32 GetStackCount() { return StackCount; }
+
+};
