@@ -4,6 +4,7 @@
 #include "Widgets/Inventory/Spatial/INV_InventoryGrid.h"
 #include "Widgets/Inventory/GridSlots/INV_GridSlot.h"
 #include "Widgets/SlottedItems/INV_SlottedItem.h"
+#include "Widgets/Utils/INV_WidgetUtils.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Items/INV_InventoryItem.h"
@@ -46,8 +47,8 @@ void UINV_InventoryGrid::AddItemAtIndex(UINV_InventoryItem* Item, const int32 In
 	const FINV_ImageFragment* ImageFragment = GetFragment<FINV_ImageFragment>(Item, Fragments::Icon);
 	if (!GridFragment || !ImageFragment) return;
 	UINV_SlottedItem* SlottedItem = CreateSlottedItem(Item, bStackable, StackAmount, GridFragment, ImageFragment, Index);
-	//add slotted item to canvas
-	//store item widget somewhere
+	AddSlottedItemToCanvas(Index, GridFragment, SlottedItem);
+	SlottedItems.Add(Index, SlottedItem);
 }
 
 UINV_SlottedItem* UINV_InventoryGrid::CreateSlottedItem(UINV_InventoryItem* Item, const bool bStackable, const int32 StackAmount, const FINV_GridFragment* GridFragment, const FINV_ImageFragment* ImageFragment, const int32 Index)
@@ -58,6 +59,16 @@ UINV_SlottedItem* UINV_InventoryGrid::CreateSlottedItem(UINV_InventoryItem* Item
 	SetSlottedItemImage(SlottedItem, GridFragment, ImageFragment);
 	SlottedItem->SetGridIndex(Index);
 	return SlottedItem;
+}
+
+void UINV_InventoryGrid::AddSlottedItemToCanvas(const int32 Index, const FINV_GridFragment* GridFragment, UINV_SlottedItem* SlottedItem) const
+{
+	CanvasPanel->AddChild(SlottedItem);
+	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(SlottedItem);
+	CanvasSlot->SetSize(GetDrawSize(GridFragment));
+	const FVector2D DrawPos = UINV_WidgetUtils::GetPositionFromIndex(Index, Columns)*TileSize;
+	const FVector2D DrawPosWithPadding = DrawPos + FVector2D(GridFragment->GetGridPadding());
+	CanvasSlot->SetPosition(DrawPosWithPadding);
 }
 
 FVector2D UINV_InventoryGrid::GetDrawSize(const FINV_GridFragment* GridFragment) const

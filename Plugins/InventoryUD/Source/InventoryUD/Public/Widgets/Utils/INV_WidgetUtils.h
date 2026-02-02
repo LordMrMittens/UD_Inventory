@@ -16,6 +16,7 @@ class INVENTORYUD_API UINV_WidgetUtils : public UBlueprintFunctionLibrary
 
 public:
 	
-	static int32 GetIndexFromPosition(const FIntPoint& Position, int32 Columns);
+	static int32 GetIndexFromPosition(const FIntPoint& Position, const int32 Columns);
+	static FIntPoint GetPositionFromIndex(const int32 Index, const int32 Columns);
 
 };
