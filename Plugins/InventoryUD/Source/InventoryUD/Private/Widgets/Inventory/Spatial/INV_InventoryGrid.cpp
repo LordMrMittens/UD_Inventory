@@ -118,8 +118,6 @@ void UINV_InventoryGrid::SetSlottedItemImage(const UINV_SlottedItem* SlottedItem
 	SlottedItem->SetImageBrush(Brush);
 }
 
-
-
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)
 {
 
@@ -154,6 +152,9 @@ FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemMa
 		//****there is a difference here in code between me and lesson Gridslot checks tile index not index but should be the same***
 		if (IsIndexClaimed(CheckedIndices, GridSlot->GetTileIndex())) continue;
 
+		//Is the item GridBounds
+		if (!IsInGridBounds(GridSlot->GetTileIndex(), GetItemDimensions(Manifest))) continue;
+
 		//Can Item fit here (IE is there room within the bounds of grid)
 		TSet<int32> TentativelyClaimed;
 		if (!HasRoomAtIndex(GridSlot, GetItemDimensions(Manifest), CheckedIndices, TentativelyClaimed, Manifest.GetItemType(), MaximumStackSize))
@@ -162,27 +163,16 @@ FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemMa
 		}
 		CheckedIndices.Append(TentativelyClaimed);
 
-		
-
 	//How much to fill?
+		const int32 AmountToFillInSlot = DetermineFillAmountForSlot(Result.bStackable, MaximumStackSize, AmountToFill, GridSlot);
+		if (AmountToFillInSlot == 0) continue;
 		//Update the amount left to fill
-		//what is the remainder
 
 	}
 
+	//what is the remainder
 
 	return Result;
-}
-
-bool UINV_InventoryGrid::IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const
-{
-
-	return CheckedIndices.Contains(Index);
-}
-
-bool UINV_InventoryGrid::HasValidItem(const UINV_GridSlot* GridSlot) const
-{
-	return GridSlot->GetInventoryItem().IsValid();
 }
 
 bool UINV_InventoryGrid::HasRoomAtIndex(const UINV_GridSlot* GridSlot, const FIntPoint& Dimensions, const TSet<int32>& CheckedIndices, TSet<int32>& OutTentativelyClaimed, const FGameplayTag& ItemType, const int32 MaxStackSize)
@@ -223,6 +213,17 @@ bool UINV_InventoryGrid::CheckSlotConstraints(const UINV_GridSlot* GridSlot, con
 	return true;
 }
 
+bool UINV_InventoryGrid::IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const
+{
+
+	return CheckedIndices.Contains(Index);
+}
+
+bool UINV_InventoryGrid::HasValidItem(const UINV_GridSlot* GridSlot) const
+{
+	return GridSlot->GetInventoryItem().IsValid();
+}
+
 bool UINV_InventoryGrid::IsUpperLeftSlot(const UINV_GridSlot* GridSlot, const UINV_GridSlot* SubGridSlot) const
 {
 
@@ -232,6 +233,35 @@ bool UINV_InventoryGrid::IsUpperLeftSlot(const UINV_GridSlot* GridSlot, const UI
 bool UINV_InventoryGrid::DoesItemTypeMatch(const UINV_InventoryItem* SubItem, const FGameplayTag& ItemType) const
 {
 	return SubItem->GetItemManifest().GetItemType().MatchesTagExact(ItemType);
+}
+
+bool UINV_InventoryGrid::IsInGridBounds(const int32 StartIndex, const FIntPoint& ItemDimensions) const
+{
+	if (StartIndex < 0 || StartIndex >= GridSlots.Num()) return false;
+	const int32 EndColumn = (StartIndex % Columns) + ItemDimensions.X;
+	const int32 EndRow = (StartIndex / Columns) + ItemDimensions.Y;
+	return EndColumn <= Columns, EndRow <= Rows;
+}
+
+int32 UINV_InventoryGrid::DetermineFillAmountForSlot(const bool bStackable, const int32 MaxStackSize, const int32 AmountToFill, const UINV_GridSlot* GridSlot) const
+{
+	//calculate room in slot
+	const int32 RoomInSlot = MaxStackSize - GetStackAmount(GridSlot);
+	//if stackable, min between amount to fill and room in slot
+	return bStackable ? FMath::Min(AmountToFill, RoomInSlot) : 1;
+}
+
+int32 UINV_InventoryGrid::GetStackAmount(const UINV_GridSlot* GridSlot) const
+{
+	int32 CurrentSlotStackCount = GridSlot->GetStackCount();
+	//if not upper left slot, slot does not hold stack count
+	//if not holding stack count get actual stack count
+	if (const int32 UpperLeftIndex = GridSlot->GetUpperLeftIndex(); UpperLeftIndex != INDEX_NONE) 
+	{
+		UINV_GridSlot* UpperLeftGridSlot = GridSlots[UpperLeftIndex];
+		CurrentSlotStackCount = UpperLeftGridSlot->GetStackCount();
+	}
+	return CurrentSlotStackCount;
 }
 
 FIntPoint UINV_InventoryGrid::GetItemDimensions(const FINV_ItemManifest& Manifest) const

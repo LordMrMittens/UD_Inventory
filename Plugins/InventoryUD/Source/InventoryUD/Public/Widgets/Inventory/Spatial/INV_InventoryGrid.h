@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Types/INV_GridTypes.h"
-#include "GameplayTagContainer.h"
 #include "INV_InventoryGrid.generated.h"
 
 class UINV_GridSlot;
@@ -17,6 +16,7 @@ class UINV_SlottedItem;
 struct FINV_ItemManifest;
 struct FINV_GridFragment;
 struct FINV_ImageFragment;
+struct FGameplayTag;
 
 
 
@@ -54,9 +54,7 @@ private:
 		const FINV_ImageFragment* ImageFragment, 
 		const int32 Index);
 
-	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
 
-	bool HasValidItem(const UINV_GridSlot* GridSlot) const;
 
 	bool HasRoomAtIndex(const UINV_GridSlot* GridSlot, 
 		const FIntPoint& Dimensions, 
@@ -72,9 +70,19 @@ private:
 		const FGameplayTag& ItemType,
 		const int32 MaxStackSize) const;
 
+	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
+
+	bool HasValidItem(const UINV_GridSlot* GridSlot) const;
+
 	bool IsUpperLeftSlot(const UINV_GridSlot* GridSlot, const UINV_GridSlot* SubGridSlot) const;
 
 	bool DoesItemTypeMatch(const UINV_InventoryItem* SubItem, const FGameplayTag& ItemType) const;
+
+	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& ItemDimensions) const;
+
+	int32 DetermineFillAmountForSlot(const bool bStackable, const int32 MaxStackSize,  const int32 AmountToFill, const UINV_GridSlot* GridSlot) const;
+
+	int32 GetStackAmount(const UINV_GridSlot* GridSlot) const;
 	
 	FIntPoint GetItemDimensions(const FINV_ItemManifest& Manifest) const;
 
