@@ -66,6 +66,7 @@ UINV_SlottedItem* UINV_InventoryGrid::CreateSlottedItem(UINV_InventoryItem* Item
 	return SlottedItem;
 }
 
+
 void UINV_InventoryGrid::AddSlottedItemToCanvas(const int32 Index, const FINV_GridFragment* GridFragment, UINV_SlottedItem* SlottedItem) const
 {
 	CanvasPanel->AddChild(SlottedItem);
@@ -133,20 +134,84 @@ FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_Invent
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemManifest& Manifest)
 {
 	FINV_SlotAvailabilityResult Result;
-	Result.TotalRoomToFill = 7;
-	Result.bStackable = true;
 
-	FINV_SlotAvailability SlotAvailability;
-	SlotAvailability.AmountToFill = 2;
-	SlotAvailability.Index = 0;
-	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability));
+	//Is the item stackable
+	const FINV_StackableFragment* StackableFragment = Manifest.GetFragmentOfType<FINV_StackableFragment>();
+	Result.bStackable = StackableFragment != nullptr;
 
-	FINV_SlotAvailability SlotAvailability2;
-	SlotAvailability2.AmountToFill = 5;
-	SlotAvailability2.Index = 1;
-	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability2));
+	//If stackable how many stacks to add
+	const int32 MaximumStackSize = StackableFragment ? StackableFragment->GetMaxStackSize() : 1;
+	int32 AmountToFill = StackableFragment ? StackableFragment->GetStackCount() : 1;
+
+	TSet<int32> CheckedIndices;
+	//loop over grid slots and 
+	for (const auto& GridSlot : GridSlots)
+	{
+		//check if there is amount to fill if not break out
+		if (AmountToFill == 0) break;
+
+		//Is this Index claimed
+		//****there is a difference here in code between me and lesson Gridslot checks tile index not index but should be the same***
+		if (IsIndexClaimed(CheckedIndices, GridSlot->GetTileIndex())) continue;
+
+		//Can Item fit here (IE is there room within the bounds of grid)
+		TSet<int32> TentativelyClaimed;
+		if (!HasRoomAtIndex(GridSlot, GetItemDimensions(Manifest), CheckedIndices, TentativelyClaimed))
+		{
+			continue;
+		}
+		CheckedIndices.Append(TentativelyClaimed);
+
+		
+
+	//How much to fill?
+		//Update the amount left to fill
+		//what is the remainder
+
+	}
+
 
 	return Result;
+}
+
+bool UINV_InventoryGrid::IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const
+{
+
+	return CheckedIndices.Contains(Index);
+}
+
+bool UINV_InventoryGrid::HasRoomAtIndex(const UINV_GridSlot* GridSlot, const FIntPoint& Dimensions, const TSet<int32>& CheckedIndices, TSet<int32>& OutTentativelyClaimed)
+{
+	//is there room at the index (IE are there other items in the way?)
+	bool bHasRoomAtIndex{ true };
+	UINV_InventoryStatics::ForEach2D(GridSlots, GridSlot->GetTileIndex(), Dimensions, Columns, [&](const UINV_GridSlot* SubGridSlot)
+		{
+			if (CheckSlotConstraints(SubGridSlot)) {
+				OutTentativelyClaimed.Add(SubGridSlot->GetTileIndex());
+			}
+			else 
+			{
+				bHasRoomAtIndex = false;
+			}
+		});
+	return bHasRoomAtIndex;
+}
+
+bool UINV_InventoryGrid::CheckSlotConstraints(const UINV_GridSlot* SubGridSlot) const
+{
+	//Other conditions - ForEach2D over a 2D range
+	//Index claimed?
+	//Has valid item
+	//Is the item the same type as the item we're trying to add
+	//if so, is it stackable
+	//if so, is the slot at the max stack size?
+	return false;
+}
+
+FIntPoint UINV_InventoryGrid::GetItemDimensions(const FINV_ItemManifest& Manifest) const
+{
+	const FINV_GridFragment* GridFragment = Manifest.GetFragmentOfType<FINV_GridFragment>();
+	return GridFragment ? GridFragment->GetGridSize() : FIntPoint(1, 1);
 }
 
 

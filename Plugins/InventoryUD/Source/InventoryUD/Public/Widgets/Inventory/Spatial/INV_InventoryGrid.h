@@ -53,6 +53,15 @@ private:
 		const FINV_ImageFragment* ImageFragment, 
 		const int32 Index);
 
+	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
+
+	bool HasRoomAtIndex(const UINV_GridSlot* GridSlot, 
+		const FIntPoint& Dimensions, 
+		const TSet<int32>& CheckedIndices,
+		TSet<int32>& OutTentativelyClaimed);
+	bool CheckSlotConstraints(const UINV_GridSlot* SubGridSlot) const;
+	FIntPoint GetItemDimensions(const FINV_ItemManifest& Manifest) const;
+
 	void AddSlottedItemToCanvas(const int32 Index, const FINV_GridFragment* GridFragment, UINV_SlottedItem* SlottedItem) const;
 
 	void UpdateGridSlots(UINV_InventoryItem* NewItem, const int32 Index, bool bStackableItem, const int32 StackAmount);

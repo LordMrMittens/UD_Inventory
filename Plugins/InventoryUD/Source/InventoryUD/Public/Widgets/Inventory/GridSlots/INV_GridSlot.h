@@ -58,7 +58,7 @@ private:
 
 public:
 	FORCEINLINE void SetTileIndex(int32 Index) { TileIndex = Index; }
-	FORCEINLINE int32 GetTileIndex() { return TileIndex; }
+	FORCEINLINE int32 GetTileIndex() const { return TileIndex; }
 	FORCEINLINE EINV_GridSlotState GetGridSlotState() { return GridSlotState; }
 	FORCEINLINE TWeakObjectPtr<UINV_InventoryItem> GetInventoryItem() { return InventoryItem; }
 	FORCEINLINE int32 GetStackCount() const { return StackCount; }
