@@ -3,6 +3,8 @@
 
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "Widgets/Inventory/InventoryBase/INV_InventoryBase.h"
+#include "Items/Components/INV_ItemComponent.h"
+#include "Items/INV_InventoryItem.h"
 #include "Net/UnrealNetwork.h"
 
 UINV_InventoryComponent::UINV_InventoryComponent() : InventoryList(this)
@@ -24,6 +26,9 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 {
 	FINV_SlotAvailabilityResult Result = InventoryMenu->HasRoomForItem(ItemComponent);
 	
+	UINV_InventoryItem* FoundItem = InventoryList.FindItemByType(ItemComponent->GetItemManifest().GetItemType());
+	Result.Item = FoundItem;
+
 	if(Result.TotalRoomToFill ==0)
 	{
 		OnNoRoomInInventory.Broadcast();
@@ -33,6 +38,7 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 	if (Result.Item.IsValid() && Result.bStackable) {
 		//Add stacks
 		Server_AddStacksToItem(ItemComponent, Result.TotalRoomToFill, Result.Remainder);
+		UE_LOG(LogTemp, Display, TEXT("Picked Up Stackable a second time"));
 	}
 	else if (Result.TotalRoomToFill > 0)
 	{
