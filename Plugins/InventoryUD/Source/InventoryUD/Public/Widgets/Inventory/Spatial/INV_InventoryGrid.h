@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Types/INV_GridTypes.h"
+#include "GameplayTagContainer.h"
 #include "INV_InventoryGrid.generated.h"
 
 class UINV_GridSlot;
@@ -55,11 +56,26 @@ private:
 
 	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
 
+	bool HasValidItem(const UINV_GridSlot* GridSlot) const;
+
 	bool HasRoomAtIndex(const UINV_GridSlot* GridSlot, 
 		const FIntPoint& Dimensions, 
 		const TSet<int32>& CheckedIndices,
-		TSet<int32>& OutTentativelyClaimed);
-	bool CheckSlotConstraints(const UINV_GridSlot* SubGridSlot) const;
+		TSet<int32>& OutTentativelyClaimed,
+		const FGameplayTag& ItemType,
+		const int32 MaxStackSize);
+
+	bool CheckSlotConstraints(const UINV_GridSlot* GridSlot, 
+		const UINV_GridSlot* SubGridSlot, 
+		const TSet<int32>& CheckedIndices, 
+		TSet<int32>& OutTentativelyClaimed, 
+		const FGameplayTag& ItemType,
+		const int32 MaxStackSize) const;
+
+	bool IsUpperLeftSlot(const UINV_GridSlot* GridSlot, const UINV_GridSlot* SubGridSlot) const;
+
+	bool DoesItemTypeMatch(const UINV_InventoryItem* SubItem, const FGameplayTag& ItemType) const;
+	
 	FIntPoint GetItemDimensions(const FINV_ItemManifest& Manifest) const;
 
 	void AddSlottedItemToCanvas(const int32 Index, const FINV_GridFragment* GridFragment, UINV_SlottedItem* SlottedItem) const;

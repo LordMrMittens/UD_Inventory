@@ -60,7 +60,7 @@ public:
 	FORCEINLINE void SetTileIndex(int32 Index) { TileIndex = Index; }
 	FORCEINLINE int32 GetTileIndex() const { return TileIndex; }
 	FORCEINLINE EINV_GridSlotState GetGridSlotState() { return GridSlotState; }
-	FORCEINLINE TWeakObjectPtr<UINV_InventoryItem> GetInventoryItem() { return InventoryItem; }
+	FORCEINLINE TWeakObjectPtr<UINV_InventoryItem> GetInventoryItem() const { return InventoryItem; }
 	FORCEINLINE int32 GetStackCount() const { return StackCount; }
 	FORCEINLINE void SetStackCount(int32 Count) { StackCount = Count; }
 	FORCEINLINE int32 GetUpperLeftIndex() const { return UpperLeftIndex; }
