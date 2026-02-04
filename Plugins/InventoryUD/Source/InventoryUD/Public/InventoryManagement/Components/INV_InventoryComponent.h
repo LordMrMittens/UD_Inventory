@@ -31,7 +31,7 @@ public:
 	void TryAddItem(UINV_ItemComponent* ItemComponent);
 
 	UFUNCTION(Server,Reliable)
-	void Server_AddNewItem(UINV_ItemComponent* ItemComponent, int32 StackCount);
+	void Server_AddNewItem(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
 
 	UFUNCTION(Server, Reliable)
 	void Server_AddStacksToItem(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
@@ -61,6 +61,7 @@ private:
 
 	void OpenInventoryMenu();
 	void CloseInventoryMenu();
+	void PickupOrUpdateStack(int32 Remainder, UINV_ItemComponent* ItemComponent);
 
 	TWeakObjectPtr<APlayerController> OwningController;
 	UPROPERTY()
@@ -72,4 +73,5 @@ private:
 	bool bInventoryMenuOpen;
 	
 		
+
 };

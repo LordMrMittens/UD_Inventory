@@ -202,7 +202,6 @@ FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const FINV_ItemMa
 		
 		//what is the remainder
 		Result.Remainder = AmountToFill;
-
 		if (AmountToFill == 0) return Result;
 	}
 

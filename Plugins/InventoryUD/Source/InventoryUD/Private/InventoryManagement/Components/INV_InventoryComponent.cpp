@@ -29,7 +29,7 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 	
 	UINV_InventoryItem* FoundItem = InventoryList.FindItemByType(ItemComponent->GetItemManifest().GetItemType());
 	Result.Item = FoundItem;
-
+	
 	if(Result.TotalRoomToFill ==0)
 	{
 		OnNoRoomInInventory.Broadcast();
@@ -42,19 +42,21 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 	}
 	else if (Result.TotalRoomToFill > 0)
 	{
-		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0);
+		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0, Result.bStackable ? Result.Remainder : 0);
 		//this item doesnt exist in the inventory, creat a new one and update slots
 	}
 }
-void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount) 
+void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
+
     UINV_InventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
 	NewItem->SetTotalStackCount(StackCount);
 	if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone) {
 		OnItemAdded.Broadcast(NewItem);
 	}
-	ItemComponent->PickedUp();
+	PickupOrUpdateStack(Remainder, ItemComponent);
 }
+
 
 void UINV_InventoryComponent::Server_AddStacksToItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
@@ -62,10 +64,15 @@ void UINV_InventoryComponent::Server_AddStacksToItem_Implementation(UINV_ItemCom
 	UINV_InventoryItem* Item = InventoryList.FindItemByType(ItemType);
 	if (!IsValid(Item)) return;
 	Item->SetTotalStackCount(Item->GetTotalStackCount() + StackCount);
+	PickupOrUpdateStack(Remainder, ItemComponent);
+}
+
+void UINV_InventoryComponent::PickupOrUpdateStack(int32 Remainder, UINV_ItemComponent* ItemComponent)
+{
 	if (Remainder == 0) {
 		ItemComponent->PickedUp();
 	}
-	else if(FINV_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeMutable<FINV_StackableFragment>())
+	else if (FINV_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeMutable<FINV_StackableFragment>())
 	{
 		StackableFragment->SetStackCount(Remainder);
 	}
