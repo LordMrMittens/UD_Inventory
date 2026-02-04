@@ -24,12 +24,18 @@ public:
 	FINV_ItemManifest& GetItemManifestMutable() { return ItemManifest.GetMutable<FINV_ItemManifest>(); }
 
 	bool IsStackable() const;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/InventoryUD.INV_ItemManifest"), Replicated ,Category = "Inventory")
 	FInstancedStruct ItemManifest;
 
+	UPROPERTY(Replicated)
+	int32 TotalStackCount{ 0 };
 
+public:
+	int32 GetTotalStackCount() const { return TotalStackCount;}
+	void SetTotalStackCount(int32 StackCount) { TotalStackCount = StackCount; }
 };
 
 template <typename FragmentType>

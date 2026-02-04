@@ -94,6 +94,9 @@ private:
 
 	void SetSlottedItemImage(const UINV_SlottedItem* SlottedItem, const FINV_GridFragment* GridFragment, const FINV_ImageFragment* ImageFragment) const;
 
+	UFUNCTION()
+	void AddStacks(const FINV_SlotAvailabilityResult& Result);
+
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Inventory")

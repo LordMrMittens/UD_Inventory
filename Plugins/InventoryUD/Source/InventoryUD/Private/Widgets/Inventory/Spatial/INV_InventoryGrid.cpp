@@ -23,6 +23,7 @@ void UINV_InventoryGrid::NativeOnInitialized()
 	ConstructGrid();
 	InventoryComponent = UINV_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
 	InventoryComponent->OnItemAdded.AddDynamic(this, &UINV_InventoryGrid::AddItem);
+	InventoryComponent->OnStackChange.AddDynamic(this, &UINV_InventoryGrid::AddStacks);
 }
 
 void UINV_InventoryGrid::AddItem(UINV_InventoryItem* Item)
@@ -116,6 +117,25 @@ void UINV_InventoryGrid::SetSlottedItemImage(const UINV_SlottedItem* SlottedItem
 
 	Brush.ImageSize = GetDrawSize(GridFragment);
 	SlottedItem->SetImageBrush(Brush);
+}
+
+void UINV_InventoryGrid::AddStacks(const FINV_SlotAvailabilityResult& Result)
+{
+	if (!MatchesCategory(Result.Item.Get())) return;
+
+	for (const auto& Availability : Result.SlotAvailabilities) {
+		if (Availability.bItemAtIndex) {
+			const auto& Gridslot = GridSlots[Availability.Index];
+			const auto& SlottedItem = SlottedItems.FindChecked(Availability.Index);
+			SlottedItem->UpdateStackCount(Gridslot->GetStackCount() + Availability.AmountToFill);
+			Gridslot->SetStackCount(Gridslot->GetStackCount() + Availability.AmountToFill);
+		}
+		else
+		{
+			AddItemAtIndex(Result.Item.Get(), Availability.Index, Result.bStackable, Availability.AmountToFill);
+			UpdateGridSlots(Result.Item.Get(), Availability.Index, Result.bStackable, Availability.AmountToFill);
+		}
+	}
 }
 
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)

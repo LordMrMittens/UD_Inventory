@@ -5,6 +5,7 @@
 #include "Widgets/Inventory/InventoryBase/INV_InventoryBase.h"
 #include "Items/Components/INV_ItemComponent.h"
 #include "Items/INV_InventoryItem.h"
+#include "Items/Fragments/INV_ItemFragment.h"
 #include "Net/UnrealNetwork.h"
 
 UINV_InventoryComponent::UINV_InventoryComponent() : InventoryList(this)
@@ -36,9 +37,8 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 	}
 
 	if (Result.Item.IsValid() && Result.bStackable) {
-		//Add stacks
+		OnStackChange.Broadcast(Result);
 		Server_AddStacksToItem(ItemComponent, Result.TotalRoomToFill, Result.Remainder);
-		UE_LOG(LogTemp, Display, TEXT("Picked Up Stackable a second time"));
 	}
 	else if (Result.TotalRoomToFill > 0)
 	{
@@ -49,16 +49,26 @@ void UINV_InventoryComponent::TryAddItem(UINV_ItemComponent* ItemComponent)
 void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount) 
 {
     UINV_InventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
-
+	NewItem->SetTotalStackCount(StackCount);
 	if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone) {
 		OnItemAdded.Broadcast(NewItem);
 	}
-	//destroy owning actor TODO
+	ItemComponent->PickedUp();
 }
 
 void UINV_InventoryComponent::Server_AddStacksToItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
-
+	const FGameplayTag& ItemType = IsValid(ItemComponent) ?  ItemComponent->GetItemManifest().GetItemType() : FGameplayTag::EmptyTag;
+	UINV_InventoryItem* Item = InventoryList.FindItemByType(ItemType);
+	if (!IsValid(Item)) return;
+	Item->SetTotalStackCount(Item->GetTotalStackCount() + StackCount);
+	if (Remainder == 0) {
+		ItemComponent->PickedUp();
+	}
+	else if(FINV_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeMutable<FINV_StackableFragment>())
+	{
+		StackableFragment->SetStackCount(Remainder);
+	}
 }
 
 // Called when the game starts
