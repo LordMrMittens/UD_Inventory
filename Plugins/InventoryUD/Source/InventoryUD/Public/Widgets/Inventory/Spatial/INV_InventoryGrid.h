@@ -13,6 +13,7 @@ class UINV_InventoryComponent;
 class UINV_InventoryItem;
 class UINV_ItemComponent;
 class UINV_SlottedItem;
+class UINV_HoverItem;
 struct FINV_ItemManifest;
 struct FINV_GridFragment;
 struct FINV_ImageFragment;
@@ -83,6 +84,11 @@ private:
 	int32 DetermineFillAmountForSlot(const bool bStackable, const int32 MaxStackSize,  const int32 AmountToFill, const UINV_GridSlot* GridSlot) const;
 
 	int32 GetStackAmount(const UINV_GridSlot* GridSlot) const;
+
+	bool IsRightClick(const FPointerEvent& MouseEvent) const;
+	bool IsLeftClick(const FPointerEvent& MouseEvent) const;
+	void PickUp(UINV_InventoryItem* ClickedItem, const int32 GridIndex);
+	void AssignHoverItem(UINV_InventoryItem* InventoryItem);
 	
 	FIntPoint GetItemDimensions(const FINV_ItemManifest& Manifest) const;
 
@@ -96,6 +102,9 @@ private:
 
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
+	
+	UFUNCTION()
+	void OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent);
 
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
@@ -113,6 +122,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
 	TSubclassOf<UINV_SlottedItem> SlottedItemClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	TSubclassOf<UINV_HoverItem> HoverItemClass;
+
+	UPROPERTY()
+	UINV_HoverItem* HoverItem;
 
 	UPROPERTY()
 	TMap<int32, TObjectPtr<UINV_SlottedItem>> SlottedItems;

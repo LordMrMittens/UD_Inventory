@@ -5,6 +5,7 @@
 #include "Widgets/Inventory/GridSlots/INV_GridSlot.h"
 #include "Widgets/SlottedItems/INV_SlottedItem.h"
 #include "Widgets/Utils/INV_WidgetUtils.h"
+#include "Widgets/Inventory/HoverItem/INV_HoverItem.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Items/INV_InventoryItem.h"
@@ -63,7 +64,7 @@ UINV_SlottedItem* UINV_InventoryGrid::CreateSlottedItem(UINV_InventoryItem* Item
 	SlottedItem->SetIsStackable(bStackable);
 	const int32 StackUpdateAmount = bStackable ? StackAmount : 0;
 	SlottedItem->UpdateStackCount(StackUpdateAmount);
-
+	SlottedItem->OnSlottedItemClicked.AddDynamic(this, &UINV_InventoryGrid::OnSlottedItemClicked);
 	return SlottedItem;
 }
 
@@ -135,6 +136,17 @@ void UINV_InventoryGrid::AddStacks(const FINV_SlotAvailabilityResult& Result)
 			AddItemAtIndex(Result.Item.Get(), Availability.Index, Result.bStackable, Availability.AmountToFill);
 			UpdateGridSlots(Result.Item.Get(), Availability.Index, Result.bStackable, Availability.AmountToFill);
 		}
+	}
+}
+
+void UINV_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	check(GridSlots.IsValidIndex(GridIndex));
+	UINV_InventoryItem* ClickedInventoryItem = GridSlots[GridIndex]->GetInventoryItem().Get();
+	if (!IsValid(HoverItem) && IsLeftClick(MouseEvent)) 
+	{
+		PickUp(ClickedInventoryItem, GridIndex);
+		
 	}
 }
 
@@ -296,6 +308,43 @@ int32 UINV_InventoryGrid::GetStackAmount(const UINV_GridSlot* GridSlot) const
 		CurrentSlotStackCount = UpperLeftGridSlot->GetStackCount();
 	}
 	return CurrentSlotStackCount;
+}
+
+bool UINV_InventoryGrid::IsRightClick(const FPointerEvent& MouseEvent) const
+{
+	return MouseEvent.GetEffectingButton() == EKeys::RightMouseButton;
+}
+
+bool UINV_InventoryGrid::IsLeftClick(const FPointerEvent& MouseEvent) const
+{
+	return MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton;
+}
+
+void UINV_InventoryGrid::PickUp(UINV_InventoryItem* ClickedItem, const int32 GridIndex)
+{
+	AssignHoverItem(ClickedItem);
+}
+
+void UINV_InventoryGrid::AssignHoverItem(UINV_InventoryItem* InventoryItem)
+{
+	if (!IsValid(HoverItem)) {
+		HoverItem = CreateWidget<UINV_HoverItem>(GetOwningPlayer(), HoverItemClass);
+	}
+	const FINV_GridFragment* GridFragment = GetFragment<FINV_GridFragment>(InventoryItem, Fragments::Grid);
+	const FINV_ImageFragment* ImageFragment = GetFragment<FINV_ImageFragment>(InventoryItem, Fragments::Icon);
+	if (!GridFragment || !ImageFragment) return;
+	const FVector2D DrawSize = GetDrawSize(GridFragment);
+	FSlateBrush IconBrush;
+	IconBrush.SetResourceObject(ImageFragment->GetIcon());
+	IconBrush.DrawAs = ESlateBrushDrawType::Image;
+	IconBrush.ImageSize = DrawSize * UWidgetLayoutLibrary::GetViewportScale(this);
+
+	HoverItem->SetImageBrush(IconBrush);
+	HoverItem->SetGridDimensions(GridFragment->GetGridSize());
+	HoverItem->SetInventoryItem(InventoryItem);
+	HoverItem->SetIsStackable(InventoryItem->IsStackable());
+
+	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default, HoverItem);
 }
 
 FIntPoint UINV_InventoryGrid::GetItemDimensions(const FINV_ItemManifest& Manifest) const
