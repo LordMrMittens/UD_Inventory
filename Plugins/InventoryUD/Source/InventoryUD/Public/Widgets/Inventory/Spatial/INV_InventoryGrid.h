@@ -89,6 +89,8 @@ private:
 	bool IsLeftClick(const FPointerEvent& MouseEvent) const;
 	void PickUp(UINV_InventoryItem* ClickedItem, const int32 GridIndex);
 	void AssignHoverItem(UINV_InventoryItem* InventoryItem);
+	void AssignHoverItem(UINV_InventoryItem* InventoryItem, const int32 GridIndex, const int32 PreviousGridIndex );
+	void RemoveItemFromGrid(UINV_InventoryItem* InventoryItem, const int32 GridIndex);
 	
 	FIntPoint GetItemDimensions(const FINV_ItemManifest& Manifest) const;
 
