@@ -35,12 +35,16 @@ void UINV_InventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 	const FVector2D CanvasPos = UINV_WidgetUtils::GetWidgetPosition(CanvasPanel);
 	const FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
 
+	if (CursorExitedCanvas(CanvasPos, UINV_WidgetUtils::GetWidgetSize(CanvasPanel), MousePos)) {
+		//Unhighlight slot 
+		return;
+	}
 	UpdateTileParameters(CanvasPos, MousePos);
 }
 
 void UINV_InventoryGrid::UpdateTileParameters(const FVector2D& WidgetPosition, const FVector2D& MousePosition) 
 {
-	//if mouse not over canvas return
+	if (!bMouseWithinCanvas) return;
 	
 	LastTileParameters = TileParameters;
 
@@ -64,6 +68,19 @@ void UINV_InventoryGrid::OnTileParametersUpdated(const FINV_TileParameters& Tile
 
 	ItemDropIndex = UINV_WidgetUtils::GetIndexFromPosition(StartingCoordinates, Columns);
 	CurrentQueryResult = CheckHoverPosition(StartingCoordinates, Dimensions);
+
+	if (CurrentQueryResult.bHasSpace)
+	{
+		HighlightSlots(ItemDropIndex, Dimensions);
+		return;
+	}
+	UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
+	if (CurrentQueryResult.ValidItem.IsValid() && GridSlots.IsValidIndex(CurrentQueryResult.UpperLeftIndex)) {
+		const FINV_GridFragment* GridFragment = GetFragment<FINV_GridFragment>(CurrentQueryResult.ValidItem.Get(), Fragments::Grid);
+		if (!GridFragment) return;
+
+		ChangeHoverType(CurrentQueryResult.UpperLeftIndex, GridFragment->GetGridSize(), EINV_GridSlotState::GreyedOut);
+	}
 }
 
 FINV_SpaceQueryResult UINV_InventoryGrid::CheckHoverPosition(const FIntPoint& Position, const FIntPoint& Dimensions)
@@ -89,6 +106,70 @@ FINV_SpaceQueryResult UINV_InventoryGrid::CheckHoverPosition(const FIntPoint& Po
 	}
 
 	return Result;
+}
+
+bool UINV_InventoryGrid::CursorExitedCanvas(const FVector2D& BoundaryPos, const FVector2D& BoundarySize, const FVector2D& Location)
+{
+	bLastMouseWithinCanvas = bMouseWithinCanvas;
+	bMouseWithinCanvas = UINV_WidgetUtils::IsWithinBounds(BoundaryPos, BoundarySize, Location);
+	if (!bMouseWithinCanvas && bLastMouseWithinCanvas) {
+		UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
+		return true;
+	}
+	return false;
+}
+
+void UINV_InventoryGrid::HighlightSlots(const int32 Index, const FIntPoint& Dimensions)
+{
+	if (!bMouseWithinCanvas) return;
+
+	UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
+
+	UINV_InventoryStatics::ForEach2D(GridSlots , Index, Dimensions, Columns, [&](UINV_GridSlot* GridSlot) {
+		GridSlot->SetOccupiedTexture();
+		});
+
+	LastHighlightedDimensions = Dimensions;
+	LastHighlightedIndex = Index;
+}
+
+void UINV_InventoryGrid::UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions)
+{
+	UINV_InventoryStatics::ForEach2D(GridSlots, Index, Dimensions, Columns, [&](UINV_GridSlot* GridSlot) {
+		if (GridSlot->GetIsAvailable()) {
+			GridSlot->SetUnoccupiedTexture();
+		}
+		else {
+
+		GridSlot->SetOccupiedTexture();
+		}
+		});
+}
+
+void UINV_InventoryGrid::ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, EINV_GridSlotState GridSlotState)
+{
+	UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
+	UINV_InventoryStatics::ForEach2D(GridSlots, Index, Dimensions, Columns, [State = GridSlotState](UINV_GridSlot* GridSlot) {
+		switch (State)
+		{
+		case EINV_GridSlotState::Unoccupied:
+			GridSlot->SetUnoccupiedTexture();
+			break;
+		case EINV_GridSlotState::Occupied:
+			GridSlot->SetOccupiedTexture();
+			break;
+		case EINV_GridSlotState::Selected:
+			GridSlot->SetSelectedTexture();
+			break;
+		case EINV_GridSlotState::GreyedOut:
+			GridSlot->SetGreyedOutTexture();
+			break;
+		default:
+			break;
+		}
+		});
+	LastHighlightedIndex = Index;
+	LastHighlightedDimensions = Dimensions;
 }
 
 FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const

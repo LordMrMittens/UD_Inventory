@@ -18,6 +18,7 @@ struct FINV_ItemManifest;
 struct FINV_GridFragment;
 struct FINV_ImageFragment;
 struct FGameplayTag;
+enum class EINV_GridSlotState : uint8;
 
 
 
@@ -114,6 +115,13 @@ private:
 
 	FINV_SpaceQueryResult CheckHoverPosition(const FIntPoint& Position,const FIntPoint& Dimensions );
 
+	bool CursorExitedCanvas(const FVector2D& BoundaryPos, const FVector2D& BoundarySize, const FVector2D& Location);
+
+	void HighlightSlots(const int32 Index, const FIntPoint& Dimensions);
+	void UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions);
+	
+	void ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, EINV_GridSlotState GridSlotState);
+
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
 	
@@ -162,6 +170,11 @@ private:
 	int32 ItemDropIndex{ INDEX_NONE };
 
 	FINV_SpaceQueryResult CurrentQueryResult;
+	bool bMouseWithinCanvas;
+	bool bLastMouseWithinCanvas;
+
+	int32 LastHighlightedIndex;
+	FIntPoint LastHighlightedDimensions;
 
 public:
 
