@@ -61,10 +61,20 @@ void UINV_InventoryGrid::OnTileParametersUpdated(const FINV_TileParameters& Tile
 	const FIntPoint Dimensions = HoverItem->GetGridDimensions();
 
 	const FIntPoint StartingCoordinates = CalculateStartingCoordinate(TileParams.Coordinates, Dimensions, TileParams.TileQuadrant);
-	//Is the position a valid position to drop item
-		//are the dimensions within grid bounds
-		//is the space already occupied
-		//if so, is there only one item in the way (can we swap?)
+
+	ItemDropIndex = UINV_WidgetUtils::GetIndexFromPosition(StartingCoordinates, Columns);
+	CurrentQueryResult = CheckHoverPosition(StartingCoordinates, Dimensions);
+}
+
+FINV_SpaceQueryResult UINV_InventoryGrid::CheckHoverPosition(const FIntPoint& Position, const FIntPoint& Dimensions) const
+{
+	FINV_SpaceQueryResult Result;
+	if(! IsInGridBounds(UINV_WidgetUtils::GetIndexFromPosition(Position,Columns), Dimensions)) return Result;
+	//are the dimensions within grid bounds
+	//is the space already occupied
+	//if so, is there only one item in the way (can we swap?)
+
+	return Result;
 }
 
 FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const
@@ -99,6 +109,8 @@ FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coord
 
 	return StartingCoord;
 }
+
+
 
 FIntPoint UINV_InventoryGrid::CalculateHoveredCoordinates(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const
 {

@@ -112,6 +112,8 @@ private:
 	void OnTileParametersUpdated(const FINV_TileParameters& TileParameters);
 	FIntPoint CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const;
 
+	FINV_SpaceQueryResult CheckHoverPosition(const FIntPoint& Position,const FIntPoint& Dimensions ) const;
+
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
 	
@@ -155,6 +157,11 @@ private:
 
 	FINV_TileParameters TileParameters;
 	FINV_TileParameters LastTileParameters;
+
+	//Index where an item would be placed if we clicked on the grid at a valid location
+	int32 ItemDropIndex{ INDEX_NONE };
+
+	FINV_SpaceQueryResult CurrentQueryResult;
 
 public:
 
