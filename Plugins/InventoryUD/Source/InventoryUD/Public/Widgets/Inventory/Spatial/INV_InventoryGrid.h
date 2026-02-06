@@ -112,7 +112,7 @@ private:
 	void OnTileParametersUpdated(const FINV_TileParameters& TileParameters);
 	FIntPoint CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const;
 
-	FINV_SpaceQueryResult CheckHoverPosition(const FIntPoint& Position,const FIntPoint& Dimensions ) const;
+	FINV_SpaceQueryResult CheckHoverPosition(const FIntPoint& Position,const FIntPoint& Dimensions );
 
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
