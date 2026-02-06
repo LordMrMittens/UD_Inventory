@@ -30,6 +30,7 @@ class INVENTORYUD_API UINV_InventoryGrid : public UUserWidget
 
 public:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	UFUNCTION()
 	void AddItem(UINV_InventoryItem* Item);
@@ -102,11 +103,22 @@ private:
 
 	void SetSlottedItemImage(const UINV_SlottedItem* SlottedItem, const FINV_GridFragment* GridFragment, const FINV_ImageFragment* ImageFragment) const;
 
+	void UpdateTileParameters(const FVector2D& WidgetPosition,const FVector2D& MousePosition);
+
+	FIntPoint CalculateHoveredCoordinates(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const;
+
+	EINV_TileQuadrant CalculateTileQuadrant(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const;
+
+	void OnTileParametersUpdated(const FINV_TileParameters& TileParameters);
+	FIntPoint CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const;
+
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
 	
 	UFUNCTION()
 	void OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent);
+
+	
 
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
 
@@ -140,6 +152,9 @@ private:
 	int32 Columns;
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	float TileSize;
+
+	FINV_TileParameters TileParameters;
+	FINV_TileParameters LastTileParameters;
 
 public:
 

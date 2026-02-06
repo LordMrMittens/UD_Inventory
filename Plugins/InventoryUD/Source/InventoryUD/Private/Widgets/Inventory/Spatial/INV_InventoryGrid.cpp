@@ -16,6 +16,7 @@
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "InventoryManagement/Utils/INV_InventoryStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "InventoryUD.h"
 #include "Widgets/Utils/INV_WidgetUtils.h"
 
 void UINV_InventoryGrid::NativeOnInitialized()
@@ -26,6 +27,101 @@ void UINV_InventoryGrid::NativeOnInitialized()
 	InventoryComponent->OnItemAdded.AddDynamic(this, &UINV_InventoryGrid::AddItem);
 	InventoryComponent->OnStackChange.AddDynamic(this, &UINV_InventoryGrid::AddStacks);
 }
+
+void UINV_InventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	const FVector2D CanvasPos = UINV_WidgetUtils::GetWidgetPosition(CanvasPanel);
+	const FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
+
+	UpdateTileParameters(CanvasPos, MousePos);
+}
+
+void UINV_InventoryGrid::UpdateTileParameters(const FVector2D& WidgetPosition, const FVector2D& MousePosition) 
+{
+	//if mouse not over canvas return
+	
+	LastTileParameters = TileParameters;
+
+	FIntPoint Coordinates = CalculateHoveredCoordinates(WidgetPosition, MousePosition);
+
+	TileParameters.Coordinates = Coordinates;
+	TileParameters.TileIndex = UINV_WidgetUtils::GetIndexFromPosition(Coordinates, Columns);
+	TileParameters.TileQuadrant = CalculateTileQuadrant(WidgetPosition, MousePosition);
+	
+	OnTileParametersUpdated(TileParameters);
+}
+
+
+void UINV_InventoryGrid::OnTileParametersUpdated(const FINV_TileParameters& TileParams)
+{
+	if (!IsValid(HoverItem)) return;
+
+	const FIntPoint Dimensions = HoverItem->GetGridDimensions();
+
+	const FIntPoint StartingCoordinates = CalculateStartingCoordinate(TileParams.Coordinates, Dimensions, TileParams.TileQuadrant);
+	//Is the position a valid position to drop item
+		//are the dimensions within grid bounds
+		//is the space already occupied
+		//if so, is there only one item in the way (can we swap?)
+}
+
+FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const
+{
+	const int32 HasEvenWidth = Dimensions.X % 2 == 0 ? 1 : 0;
+	const int32 HasEvenHeight = Dimensions.Y % 2 == 0 ? 1 : 0;
+
+	FIntPoint StartingCoord;
+
+	switch(Quadrant) {
+
+		case EINV_TileQuadrant::TopLeft:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
+			break;
+		case EINV_TileQuadrant::TopRight:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
+			break;
+		case EINV_TileQuadrant::BottomLeft:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
+			break;
+		case EINV_TileQuadrant::BottomRight:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
+			break;
+		default:
+			UE_LOG(LogInventory, Error, TEXT("Invalid Quadrant"));
+			return FIntPoint(-1, -1);
+	}
+
+	return StartingCoord;
+}
+
+FIntPoint UINV_InventoryGrid::CalculateHoveredCoordinates(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const
+{
+	return 	FIntPoint { static_cast<int32>(FMath::FloorToInt((MousePosition.X - WidgetPosition.X) / TileSize)),
+	static_cast<int32>(FMath::FloorToInt((MousePosition.Y - WidgetPosition.Y) / TileSize))};
+}
+
+EINV_TileQuadrant UINV_InventoryGrid::CalculateTileQuadrant(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const
+{
+	//Calculate RelativePos In the current Tile
+	const float TileLocalX = FMath::Fmod(MousePosition.X - WidgetPosition.Y, TileSize);
+	const float TileLocalY = FMath::Fmod(MousePosition.Y - WidgetPosition.Y, TileSize);
+	const bool bIsTop = TileLocalY < TileSize / 2.f; //Tile if Y in upper half
+	const bool bIsLeft = TileLocalX < TileSize / 2.f; //left if X is left half
+
+	EINV_TileQuadrant HoveredTileQuadrant{ EINV_TileQuadrant::None };
+	if (bIsTop && bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::TopLeft;
+	else if (bIsTop && !bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::TopRight;
+	else if (!bIsTop && bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::BottomLeft;
+	else if (!bIsTop && !bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::BottomRight;
+	return HoveredTileQuadrant;
+}
+
 
 void UINV_InventoryGrid::AddItem(UINV_InventoryItem* Item)
 {
@@ -119,6 +215,8 @@ void UINV_InventoryGrid::SetSlottedItemImage(const UINV_SlottedItem* SlottedItem
 	Brush.ImageSize = GetDrawSize(GridFragment);
 	SlottedItem->SetImageBrush(Brush);
 }
+
+
 
 void UINV_InventoryGrid::AddStacks(const FINV_SlotAvailabilityResult& Result)
 {
