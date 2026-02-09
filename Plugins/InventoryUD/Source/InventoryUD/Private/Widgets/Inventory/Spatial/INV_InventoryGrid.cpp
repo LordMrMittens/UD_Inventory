@@ -602,9 +602,36 @@ void UINV_InventoryGrid::ConstructGrid()
 			GridCPS->SetSize(FVector2D(TileSize, TileSize));
 			GridCPS->SetPosition(FVector2D(TilePosition * TileSize));
 			GridSlots.Add(GridSlot);
+			GridSlot->GridSlotClicked.AddDynamic(this, &UINV_InventoryGrid::OnGridSlotClicked);
+			GridSlot->GridSlotHovered.AddDynamic(this, &UINV_InventoryGrid::OnGridSlotHovered);
+			GridSlot->GridSlotUnhovered.AddDynamic(this, &UINV_InventoryGrid::OnGridSlotUnhovered);
 		}
 	}
 
+}
+
+void UINV_InventoryGrid::OnGridSlotClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+
+}
+
+void UINV_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	if (IsValid(HoverItem)) return;
+
+	UINV_GridSlot* GridSlot = GridSlots[GridIndex];
+	if (GridSlot->GetIsAvailable()) {
+		GridSlot->SetOccupiedTexture();
+	}
+}
+
+void UINV_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	if (IsValid(HoverItem)) return;
+	UINV_GridSlot* GridSlot = GridSlots[GridIndex];
+	if (GridSlot->GetIsAvailable()) {
+		GridSlot->SetOccupiedTexture();
+	}
 }
 
 bool UINV_InventoryGrid::MatchesCategory(const UINV_InventoryItem* Item) const
