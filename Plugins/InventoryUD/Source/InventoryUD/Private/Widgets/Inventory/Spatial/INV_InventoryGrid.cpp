@@ -630,7 +630,7 @@ void UINV_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEven
 	if (IsValid(HoverItem)) return;
 	UINV_GridSlot* GridSlot = GridSlots[GridIndex];
 	if (GridSlot->GetIsAvailable()) {
-		GridSlot->SetOccupiedTexture();
+		GridSlot->SetUnoccupiedTexture();
 	}
 }
 
