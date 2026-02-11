@@ -172,6 +172,7 @@ void UINV_InventoryGrid::ChangeHoverType(const int32 Index, const FIntPoint& Dim
 	LastHighlightedDimensions = Dimensions;
 }
 
+
 FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const EINV_TileQuadrant Quadrant) const
 {
 	const int32 HasEvenWidth = Dimensions.X % 2 == 0 ? 1 : 0;
@@ -620,9 +621,31 @@ void UINV_InventoryGrid::OnGridSlotClicked(int32 GridIndex, const FPointerEvent&
 		return;
 	}
 	auto GridSlot = GridSlots[ItemDropIndex];
-	if (!GridSlot->GetInventoryItem().IsValid()) {
-		// put item down at index
+	if (!GridSlot->GetInventoryItem().IsValid()) 
+	{
+		PutDownOnIndex(GridIndex);
+		ClearHoverItem();
 	}
+}
+
+void UINV_InventoryGrid::PutDownOnIndex(const int32 Index)
+{
+	AddItemAtIndex(HoverItem->GetInventoryItem(), Index, HoverItem->GetIsStackable(), HoverItem->GetStackCount());
+	UpdateGridSlots(HoverItem->GetInventoryItem(), Index, HoverItem->GetIsStackable(), HoverItem->GetStackCount());
+}
+
+void UINV_InventoryGrid::ClearHoverItem()
+{
+	if (!IsValid(HoverItem)) return;
+	HoverItem->SetInventoryItem(nullptr);
+	HoverItem->SetIsStackable(false);
+	HoverItem->SetPreviousGridIndex(INDEX_NONE);
+	HoverItem->SetStackCount(0);
+	HoverItem->SetImageBrush(FSlateNoResource());
+	HoverItem->RemoveFromParent();
+	HoverItem = nullptr;
+
+	//TODO Show Mouse Cursor
 }
 
 void UINV_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
