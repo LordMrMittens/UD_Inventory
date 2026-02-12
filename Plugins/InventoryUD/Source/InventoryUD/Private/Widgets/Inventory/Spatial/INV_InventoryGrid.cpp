@@ -179,30 +179,28 @@ FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coord
 	const int32 HasEvenHeight = Dimensions.Y % 2 == 0 ? 1 : 0;
 
 	FIntPoint StartingCoord;
-
-	switch(Quadrant) {
-
-		case EINV_TileQuadrant::TopLeft:
-			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
-			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
-			break;
-		case EINV_TileQuadrant::TopRight:
-			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
-			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
-			break;
-		case EINV_TileQuadrant::BottomLeft:
-			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
-			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
-			break;
-		case EINV_TileQuadrant::BottomRight:
-			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
-			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
-			break;
-		default:
-			UE_LOG(LogInventory, Error, TEXT("Invalid Quadrant"));
+	switch (Quadrant)
+	{
+	case EINV_TileQuadrant::TopLeft:
+		StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
+		StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
+		break;
+	case EINV_TileQuadrant::TopRight:
+		StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
+		StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
+		break;
+	case EINV_TileQuadrant::BottomLeft:
+		StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
+		StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
+		break;
+	case EINV_TileQuadrant::BottomRight:
+		StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
+		StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
+		break;
+	default:
+		UE_LOG(LogInventory, Error, TEXT("Invalid Quadrant."))
 			return FIntPoint(-1, -1);
 	}
-
 	return StartingCoord;
 }
 
@@ -210,23 +208,28 @@ FIntPoint UINV_InventoryGrid::CalculateStartingCoordinate(const FIntPoint& Coord
 
 FIntPoint UINV_InventoryGrid::CalculateHoveredCoordinates(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const
 {
-	return 	FIntPoint { static_cast<int32>(FMath::FloorToInt((MousePosition.X - WidgetPosition.X) / TileSize)),
-	static_cast<int32>(FMath::FloorToInt((MousePosition.Y - WidgetPosition.Y) / TileSize))};
+	return FIntPoint{
+		static_cast<int32>(FMath::FloorToInt((MousePosition.X - WidgetPosition.X) / TileSize)),
+		static_cast<int32>(FMath::FloorToInt((MousePosition.Y - WidgetPosition.Y) / TileSize))
+	};
 }
 
 EINV_TileQuadrant UINV_InventoryGrid::CalculateTileQuadrant(const FVector2D& WidgetPosition, const FVector2D& MousePosition) const
 {
-	//Calculate RelativePos In the current Tile
-	const float TileLocalX = FMath::Fmod(MousePosition.X - WidgetPosition.Y, TileSize);
+	// Calculate relative position within the current tile
+	const float TileLocalX = FMath::Fmod(MousePosition.X - WidgetPosition.X, TileSize);
 	const float TileLocalY = FMath::Fmod(MousePosition.Y - WidgetPosition.Y, TileSize);
-	const bool bIsTop = TileLocalY < TileSize / 2.f; //Tile if Y in upper half
-	const bool bIsLeft = TileLocalX < TileSize / 2.f; //left if X is left half
+
+	// Determine which quadrant the mouse is in
+	const bool bIsTop = TileLocalY < TileSize / 2.f; // Top if Y is in the upper half
+	const bool bIsLeft = TileLocalX < TileSize / 2.f; // Left if X is in the left half
 
 	EINV_TileQuadrant HoveredTileQuadrant{ EINV_TileQuadrant::None };
 	if (bIsTop && bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::TopLeft;
 	else if (bIsTop && !bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::TopRight;
 	else if (!bIsTop && bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::BottomLeft;
 	else if (!bIsTop && !bIsLeft) HoveredTileQuadrant = EINV_TileQuadrant::BottomRight;
+
 	return HoveredTileQuadrant;
 }
 
@@ -352,8 +355,26 @@ void UINV_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEve
 	if (!IsValid(HoverItem) && IsLeftClick(MouseEvent)) 
 	{
 		PickUp(ClickedInventoryItem, GridIndex);
-		
+		return;
 	}
+	if (IsSameStackable(ClickedInventoryItem)) {
+		const int32 ClickedStackCount = GridSlots[GridIndex]->GetStackCount();
+		const FINV_StackableFragment* StackableFragment = ClickedInventoryItem->GetItemManifest().GetFragmentOfType<FINV_StackableFragment>();
+		const int32 MaxStackSize = StackableFragment->GetMaxStackSize();
+		const int32 RoomInClickedSlot = MaxStackSize - ClickedStackCount;
+		const int32 HoveredStackCount = HoverItem->GetStackCount();
+		if (bShouldSwapStackCounts(RoomInClickedSlot, HoveredStackCount, MaxStackSize)) {
+			SwapStackCounts(ClickedStackCount, HoveredStackCount, GridIndex);
+			//Swap stack counts
+		}
+		if (ShouldConsumeHoverItemStacks(HoveredStackCount, RoomInClickedSlot)) {
+
+			ConsumeHoverItemStacks(ClickedStackCount, HoveredStackCount, GridIndex);
+		}
+
+		return;
+	}
+	SwapWithHoverItem(ClickedInventoryItem, GridIndex);
 }
 
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)
@@ -634,6 +655,38 @@ void UINV_InventoryGrid::PutDownOnIndex(const int32 Index)
 	UpdateGridSlots(HoverItem->GetInventoryItem(), Index, HoverItem->GetIsStackable(), HoverItem->GetStackCount());
 }
 
+void UINV_InventoryGrid::SwapWithHoverItem(UINV_InventoryItem* ClickedInventoryItem, const int32 Index)
+{
+	if (!IsValid(HoverItem)) return;
+	UINV_InventoryItem* TempInventoryItem = HoverItem->GetInventoryItem();
+	const int32 TempStackCount = HoverItem->GetStackCount();
+	const bool bTempIsStackable = HoverItem->GetIsStackable();
+
+	//keep the same previous grid index
+
+	AssignHoverItem(ClickedInventoryItem, Index, HoverItem->GetPreviousGridIndex());
+	RemoveItemFromGrid(ClickedInventoryItem, Index);
+	AddItemAtIndex(TempInventoryItem, ItemDropIndex, bTempIsStackable, TempStackCount);
+	UpdateGridSlots(TempInventoryItem, ItemDropIndex, bTempIsStackable, TempStackCount);
+}
+
+bool UINV_InventoryGrid::bShouldSwapStackCounts(const int32 RoomInClickedSlot, const int32 HoveredStackCount, const int32 MaxStackSize) const
+{
+
+	return RoomInClickedSlot == 0 && HoveredStackCount < MaxStackSize;
+}
+
+void UINV_InventoryGrid::SwapStackCounts(const int32 ClickedStackCount, const int32 HoverStackCount, const int32 Index)
+{
+	UINV_GridSlot* GridSlot = GridSlots[Index];
+	GridSlot->SetStackCount(HoverStackCount);
+
+	UINV_SlottedItem* ClickedSlottedItem = SlottedItems.FindChecked(Index);
+	ClickedSlottedItem->UpdateStackCount(HoverStackCount);
+
+	HoverItem->UpdateStackCount(ClickedStackCount);
+}
+
 void UINV_InventoryGrid::ClearHoverItem()
 {
 	if (!IsValid(HoverItem)) return;
@@ -660,6 +713,31 @@ UUserWidget* UINV_InventoryGrid::GetHiddenCursorWidget()
 		HiddenCursorWidget = CreateWidget<UUserWidget>(GetOwningPlayer(), HiddenCursorWidgetClass);
 	}
 	return HiddenCursorWidget;
+}
+bool UINV_InventoryGrid::IsSameStackable(const UINV_InventoryItem* ClickedInventoryItem) const
+{
+	const bool bIsSameItem = ClickedInventoryItem == HoverItem->GetInventoryItem();
+	const bool bIsStackable = ClickedInventoryItem->IsStackable();
+	
+	return bIsSameItem && bIsStackable && HoverItem->GetItemType().MatchesTagExact(ClickedInventoryItem->GetItemManifest().GetItemType());
+}
+bool UINV_InventoryGrid::ShouldConsumeHoverItemStacks(const int32 HoveredStackCount, const int32 RoomInClickedSlot) const
+{
+	return RoomInClickedSlot >= HoveredStackCount;
+}
+void UINV_InventoryGrid::ConsumeHoverItemStacks(const int32 ClickedStackCount, const int32 HoverStackCount, const int32 Index)
+{
+	const int32 AmountToTransfer = HoverStackCount;
+	const int32 NewClickedStackCount = ClickedStackCount + AmountToTransfer;
+
+	GridSlots[Index]->SetStackCount(NewClickedStackCount);
+	SlottedItems.FindChecked(Index)->UpdateStackCount(NewClickedStackCount);
+	ClearHoverItem();
+	ShowCursor();
+
+	const FINV_GridFragment* GridFragment = GridSlots[Index]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FINV_GridFragment>();
+	const FIntPoint Dimensions = GridFragment ? GridFragment->GetGridSize() : FIntPoint(1, 1);
+	HighlightSlots(Index, Dimensions);
 }
 void UINV_InventoryGrid::ShowCursor()
 {

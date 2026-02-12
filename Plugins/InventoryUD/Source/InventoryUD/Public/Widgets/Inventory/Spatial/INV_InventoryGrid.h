@@ -127,10 +127,21 @@ private:
 
 	void PutDownOnIndex(const int32 Index);
 
+	void SwapWithHoverItem(UINV_InventoryItem* ClickedInventoryItem, const int32 Index);
+
+	bool bShouldSwapStackCounts(const int32 RoomInClickedSlot, const int32 HoveredStackCount, const int32 MaxStackSize) const;
+
+	void SwapStackCounts(const int32 ClickedStackCount, const int32 HoverStackCount, const int32 Index);
+
 	void ClearHoverItem();
 
 	UUserWidget* GetVisibleCursorWidget();
 	UUserWidget* GetHiddenCursorWidget();
+
+	bool IsSameStackable(const UINV_InventoryItem* ClickedInventoryItem) const;
+
+	bool ShouldConsumeHoverItemStacks(const int32 HoveredStackCount, const int32 RoomInClickedSlot) const;
+	void ConsumeHoverItemStacks(const int32 ClickedStackCount, const int32 HoverStackCount, const int32 Index);
 
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
