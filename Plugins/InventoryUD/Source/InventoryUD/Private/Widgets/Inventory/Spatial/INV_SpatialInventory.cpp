@@ -56,6 +56,9 @@ void UINV_SpatialInventory::ShowCraftables()
 void UINV_SpatialInventory::SetActiveGrid(UINV_InventoryGrid* Grid, UButton* Button)
 {
 	if (!IsValid(Switcher) || !Grid || !Button) return;
+	if(ActiveGrid.IsValid()) ActiveGrid->HideCursor();
+	ActiveGrid = Grid;
+	if (ActiveGrid.IsValid()) ActiveGrid->ShowCursor();
 	DisableButton(Button);
 	Switcher->SetActiveWidget(Grid);
 }

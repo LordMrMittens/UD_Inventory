@@ -637,15 +637,39 @@ void UINV_InventoryGrid::PutDownOnIndex(const int32 Index)
 void UINV_InventoryGrid::ClearHoverItem()
 {
 	if (!IsValid(HoverItem)) return;
-	HoverItem->SetInventoryItem(nullptr);
-	HoverItem->SetIsStackable(false);
-	HoverItem->SetPreviousGridIndex(INDEX_NONE);
-	HoverItem->SetStackCount(0);
-	HoverItem->SetImageBrush(FSlateNoResource());
-	HoverItem->RemoveFromParent();
+	HoverItem->ClearItem();
 	HoverItem = nullptr;
+	ShowCursor();
+}
 
-	//TODO Show Mouse Cursor
+UUserWidget* UINV_InventoryGrid::GetVisibleCursorWidget()
+{
+	if(!IsValid(GetOwningPlayer())) return nullptr;
+	if (!IsValid(VisibleCursorWidget))
+	{
+		VisibleCursorWidget = CreateWidget<UUserWidget>(GetOwningPlayer(), VisibleCursorWidgetClass);
+	}
+	return VisibleCursorWidget;
+}
+
+UUserWidget* UINV_InventoryGrid::GetHiddenCursorWidget()
+{
+	if (!IsValid(GetOwningPlayer())) return nullptr;
+	if (!IsValid(HiddenCursorWidget))
+	{
+		HiddenCursorWidget = CreateWidget<UUserWidget>(GetOwningPlayer(), HiddenCursorWidgetClass);
+	}
+	return HiddenCursorWidget;
+}
+void UINV_InventoryGrid::ShowCursor()
+{
+	if (!IsValid(GetOwningPlayer())) return;
+	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default, GetVisibleCursorWidget());
+}
+void UINV_InventoryGrid::HideCursor()
+{
+	if (!IsValid(GetOwningPlayer())) return;
+	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default, GetHiddenCursorWidget());
 }
 
 void UINV_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)

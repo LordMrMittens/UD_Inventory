@@ -19,11 +19,12 @@ class INVENTORYUD_API UINV_HoverItem : public UUserWidget
 public:
 
 	void SetImageBrush(const FSlateBrush& Brush) const;
-	void UpdateStackCount(const int32 Count) const;
+	void UpdateStackCount(const int32 Count);
 	void SetIsStackable(const bool bStackable);
 	UINV_InventoryItem* GetInventoryItem() const;
 	void SetInventoryItem(UINV_InventoryItem* Item);
 	FGameplayTag GetItemType() const;
+	void ClearItem();
 
 private:
 

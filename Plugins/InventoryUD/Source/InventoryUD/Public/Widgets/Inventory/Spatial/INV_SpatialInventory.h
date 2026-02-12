@@ -40,6 +40,8 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Button_Craftables;
 
+	TWeakObjectPtr<UINV_InventoryGrid> ActiveGrid;
+
 	UFUNCTION()
 	void ShowEquippables();
 	UFUNCTION()

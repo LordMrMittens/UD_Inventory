@@ -11,8 +11,9 @@ void UINV_HoverItem::SetImageBrush(const FSlateBrush& Brush) const
 	Image_Icon->SetBrush(Brush);
 }
 
-void UINV_HoverItem::UpdateStackCount(const int32 Count) const
+void UINV_HoverItem::UpdateStackCount(const int32 Count)
 {
+	StackCount = Count;
 	if (Count > 0) {
 
 		Text_StackCount->SetText(FText::AsNumber(Count));
@@ -30,6 +31,15 @@ FGameplayTag UINV_HoverItem::GetItemType() const
 		return InventoryItem->GetItemManifest().GetItemType();
 	}
 	return FGameplayTag::EmptyTag;
+}
+void UINV_HoverItem::ClearItem()
+{
+	SetInventoryItem(nullptr);
+	SetIsStackable(false);
+	SetPreviousGridIndex(INDEX_NONE);
+	SetStackCount(0);
+	SetImageBrush(FSlateNoResource());
+	RemoveFromParent();
 }
 void UINV_HoverItem::SetIsStackable(const bool bStackable) 
 {
