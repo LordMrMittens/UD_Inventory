@@ -14,6 +14,7 @@ class UINV_InventoryItem;
 class UINV_ItemComponent;
 class UINV_SlottedItem;
 class UINV_HoverItem;
+class UINV_ItemPopUp;
 struct FINV_ItemManifest;
 struct FINV_GridFragment;
 struct FINV_ImageFragment;
@@ -40,6 +41,7 @@ public:
 
 	void ShowCursor();
 	void HideCursor();
+	void SetOwningCanvasPanel(UCanvasPanel* CanvasPanel);
 
 private:
 
@@ -145,6 +147,8 @@ private:
 	bool ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const;
 	void FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index);
 
+	void CreateItemPopUp(const int32 GridIndex);
+
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
 	
@@ -165,6 +169,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UUserWidget> HiddenCursorWidgetClass;
 
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<UINV_ItemPopUp> ItemPopUpClass;
+
+	UPROPERTY()
+	TObjectPtr<UINV_ItemPopUp> ItemPopUp;
+
 	UPROPERTY()
 	TObjectPtr<UUserWidget> VisibleCursorWidget;
 
@@ -172,6 +182,7 @@ private:
 	TObjectPtr<UUserWidget> HiddenCursorWidget;
 
 	TWeakObjectPtr<UINV_InventoryComponent> InventoryComponent;
+	TWeakObjectPtr<UCanvasPanel> OwningCanvasPanel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Inventory")
 	EINV_ItemCategory ItemCategory;

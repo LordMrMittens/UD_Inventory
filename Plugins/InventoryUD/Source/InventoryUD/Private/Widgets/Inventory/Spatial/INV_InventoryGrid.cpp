@@ -5,6 +5,7 @@
 #include "Widgets/Inventory/GridSlots/INV_GridSlot.h"
 #include "Widgets/SlottedItems/INV_SlottedItem.h"
 #include "Widgets/Utils/INV_WidgetUtils.h"
+#include "Widgets/ItemPopUp/INV_ItemPopUp.h"
 #include "Widgets/Inventory/HoverItem/INV_HoverItem.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -357,6 +358,10 @@ void UINV_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEve
 		PickUp(ClickedInventoryItem, GridIndex);
 		return;
 	}
+	if (IsRightClick(MouseEvent)) {
+		CreateItemPopUp(GridIndex);
+		return;
+	}
 	if (IsSameStackable(ClickedInventoryItem)) 
 		{
 		const int32 ClickedStackCount = GridSlots[GridIndex]->GetStackCount();
@@ -387,6 +392,32 @@ void UINV_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEve
 	SwapWithHoverItem(ClickedInventoryItem, GridIndex);
 }
 
+void UINV_InventoryGrid::CreateItemPopUp(const int32 GridIndex)
+{
+	UINV_InventoryItem* RightClickedItem = GridSlots[GridIndex]->GetInventoryItem().Get();
+	if (!IsValid(RightClickedItem)) return;
+
+	ItemPopUp = CreateWidget<UINV_ItemPopUp>(this, ItemPopUpClass);
+
+	if (OwningCanvasPanel.IsValid())
+	{
+		OwningCanvasPanel->AddChild(ItemPopUp);
+
+		UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(ItemPopUp);
+		if (CanvasSlot)
+		{
+			const FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
+			CanvasSlot->SetPosition(MousePosition);
+			CanvasSlot->SetSize(ItemPopUp->GetBoxSize());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("ItemPopUp is not in a Canvas Slot! Check your Hierarchy."));
+		}
+	}
+
+}
+
 bool UINV_InventoryGrid::ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const
 {
 	return RoomInClickedSlot < HoveredStackCount;
@@ -405,6 +436,8 @@ void UINV_InventoryGrid::FillInStack(const int32 FillAmount, const int32 Remaind
 	HoverItem->UpdateStackCount(Remainder);
 
 }
+
+
 
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)
 {
@@ -777,6 +810,11 @@ void UINV_InventoryGrid::HideCursor()
 {
 	if (!IsValid(GetOwningPlayer())) return;
 	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default, GetHiddenCursorWidget());
+}
+
+void UINV_InventoryGrid::SetOwningCanvasPanel(UCanvasPanel* OwningCanvas)
+{
+	OwningCanvasPanel = OwningCanvas;
 }
 
 void UINV_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
