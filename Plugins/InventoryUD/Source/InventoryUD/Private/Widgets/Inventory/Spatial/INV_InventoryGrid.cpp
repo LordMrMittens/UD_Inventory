@@ -357,24 +357,53 @@ void UINV_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEve
 		PickUp(ClickedInventoryItem, GridIndex);
 		return;
 	}
-	if (IsSameStackable(ClickedInventoryItem)) {
+	if (IsSameStackable(ClickedInventoryItem)) 
+		{
 		const int32 ClickedStackCount = GridSlots[GridIndex]->GetStackCount();
 		const FINV_StackableFragment* StackableFragment = ClickedInventoryItem->GetItemManifest().GetFragmentOfType<FINV_StackableFragment>();
 		const int32 MaxStackSize = StackableFragment->GetMaxStackSize();
 		const int32 RoomInClickedSlot = MaxStackSize - ClickedStackCount;
 		const int32 HoveredStackCount = HoverItem->GetStackCount();
-		if (bShouldSwapStackCounts(RoomInClickedSlot, HoveredStackCount, MaxStackSize)) {
+		if (bShouldSwapStackCounts(RoomInClickedSlot, HoveredStackCount, MaxStackSize))
+		{
 			SwapStackCounts(ClickedStackCount, HoveredStackCount, GridIndex);
-			//Swap stack counts
+			return;
 		}
-		if (ShouldConsumeHoverItemStacks(HoveredStackCount, RoomInClickedSlot)) {
+		if (ShouldConsumeHoverItemStacks(HoveredStackCount, RoomInClickedSlot)) 
+		{
 
 			ConsumeHoverItemStacks(ClickedStackCount, HoveredStackCount, GridIndex);
+			return;
 		}
-
-		return;
+		
+		if (ShouldFillInStack(RoomInClickedSlot, HoveredStackCount)) 
+		{
+			FillInStack(RoomInClickedSlot, HoveredStackCount - RoomInClickedSlot, GridIndex);
+			return;
+		}
+		//Slot is full, do nothing
+		if (RoomInClickedSlot == 0) return;
 	}
 	SwapWithHoverItem(ClickedInventoryItem, GridIndex);
+}
+
+bool UINV_InventoryGrid::ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const
+{
+	return RoomInClickedSlot < HoveredStackCount;
+}
+
+void UINV_InventoryGrid::FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index)
+{
+	UINV_GridSlot* GridSlot = GridSlots[Index];
+	const int32 NewStackCount = GridSlot->GetStackCount() + FillAmount;
+
+	GridSlot->SetStackCount(NewStackCount);
+
+	UINV_SlottedItem* ClickedSlottedItem = SlottedItems.FindChecked(Index);
+	ClickedSlottedItem->UpdateStackCount(NewStackCount);
+
+	HoverItem->UpdateStackCount(Remainder);
+
 }
 
 FINV_SlotAvailabilityResult UINV_InventoryGrid::HasRoomForItem(const UINV_ItemComponent* ItemComponent)

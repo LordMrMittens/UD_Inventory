@@ -142,12 +142,15 @@ private:
 
 	bool ShouldConsumeHoverItemStacks(const int32 HoveredStackCount, const int32 RoomInClickedSlot) const;
 	void ConsumeHoverItemStacks(const int32 ClickedStackCount, const int32 HoverStackCount, const int32 Index);
+	bool ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const;
+	void FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index);
 
 	UFUNCTION()
 	void AddStacks(const FINV_SlotAvailabilityResult& Result);
 	
 	UFUNCTION()
 	void OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent);
+
 
 	UFUNCTION()
 	void OnGridSlotClicked(int32 GridIndex, const FPointerEvent& MouseEvent);
