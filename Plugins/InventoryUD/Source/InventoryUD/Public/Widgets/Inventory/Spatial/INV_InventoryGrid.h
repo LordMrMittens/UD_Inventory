@@ -163,6 +163,13 @@ private:
 	UFUNCTION()
 	void OnGridSlotUnhovered(int32 GridIndex, const FPointerEvent& MouseEvent);
 
+	UFUNCTION()
+	void OnPopUpMenuSplit(int32 SplitAmout, int32 Index);
+	UFUNCTION()
+	void OnPopUpMenuDrop(int32 Index);
+	UFUNCTION()
+	void OnPopUpMenuConsume(int32 Index);
+
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UUserWidget> VisibleCursorWidgetClass;
 
@@ -174,6 +181,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UINV_ItemPopUp> ItemPopUp;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	FVector2D ItemPopUpOffset = FVector2D{ 10.0f,10.0f };
 
 	UPROPERTY()
 	TObjectPtr<UUserWidget> VisibleCursorWidget;

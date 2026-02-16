@@ -396,8 +396,10 @@ void UINV_InventoryGrid::CreateItemPopUp(const int32 GridIndex)
 {
 	UINV_InventoryItem* RightClickedItem = GridSlots[GridIndex]->GetInventoryItem().Get();
 	if (!IsValid(RightClickedItem)) return;
+	if (IsValid(GridSlots[GridIndex]->GetItemPopUp())) return;
 
 	ItemPopUp = CreateWidget<UINV_ItemPopUp>(this, ItemPopUpClass);
+	GridSlots[GridIndex]->SetItemPopUp(ItemPopUp);
 
 	if (OwningCanvasPanel.IsValid())
 	{
@@ -407,8 +409,24 @@ void UINV_InventoryGrid::CreateItemPopUp(const int32 GridIndex)
 		if (CanvasSlot)
 		{
 			const FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
-			CanvasSlot->SetPosition(MousePosition);
+			CanvasSlot->SetPosition(MousePosition + ItemPopUpOffset);
 			CanvasSlot->SetSize(ItemPopUp->GetBoxSize());
+
+			const int32 SliderMax = GridSlots[GridIndex]->GetStackCount() - 1;
+			if (RightClickedItem->IsStackable() && SliderMax > 0) {
+				ItemPopUp->PopUpSplit.BindDynamic(this, &ThisClass::OnPopUpMenuSplit);
+				ItemPopUp->SetSliderParams(SliderMax, FMath::Max(1, GridSlots[GridIndex]->GetStackCount()/2));
+			}
+			else {
+				ItemPopUp->CollapseSplitButton();
+			}
+			ItemPopUp->PopUpDrop.BindDynamic(this, &ThisClass::OnPopUpMenuDrop);
+			if (RightClickedItem->IsConsumable()) {
+				ItemPopUp->PopUpConsume.BindDynamic(this, &ThisClass::OnPopUpMenuConsume);
+			}
+			else {
+				ItemPopUp->CollapseConsumeButton();
+			}
 		}
 		else
 		{
@@ -703,10 +721,11 @@ void UINV_InventoryGrid::OnGridSlotClicked(int32 GridIndex, const FPointerEvent&
 		OnSlottedItemClicked(CurrentQueryResult.UpperLeftIndex, MouseEvent);
 		return;
 	}
+	if (!IsInGridBounds(ItemDropIndex, HoverItem->GetGridDimensions()))return;
 	auto GridSlot = GridSlots[ItemDropIndex];
 	if (!GridSlot->GetInventoryItem().IsValid()) 
 	{
-		PutDownOnIndex(GridIndex);
+		PutDownOnIndex(ItemDropIndex);
 		ClearHoverItem();
 	}
 }
@@ -834,6 +853,18 @@ void UINV_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEven
 	if (GridSlot->GetIsAvailable()) {
 		GridSlot->SetUnoccupiedTexture();
 	}
+}
+
+void UINV_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmout, int32 Index)
+{
+}
+
+void UINV_InventoryGrid::OnPopUpMenuDrop(int32 Index)
+{
+}
+
+void UINV_InventoryGrid::OnPopUpMenuConsume(int32 Index)
+{
 }
 
 bool UINV_InventoryGrid::MatchesCategory(const UINV_InventoryItem* Item) const

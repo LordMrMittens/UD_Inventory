@@ -24,6 +24,7 @@ public:
 	FINV_ItemManifest& GetItemManifestMutable() { return ItemManifest.GetMutable<FINV_ItemManifest>(); }
 
 	bool IsStackable() const;
+	bool IsConsumable() const;
 
 private:
 

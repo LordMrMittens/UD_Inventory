@@ -8,6 +8,7 @@
 
 class UImage;
 class UINV_InventoryItem;
+class UINV_ItemPopUp;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGridSlotEvent, int32, GridIndex, const FPointerEvent&, MouseEvent);
 
@@ -37,6 +38,8 @@ public:
 	void SetSelectedTexture();
 	void SetGreyedOutTexture();
 	void SetInventoryItem(UINV_InventoryItem* Item);
+	UINV_ItemPopUp* GetItemPopUp() const;
+	void SetItemPopUp(UINV_ItemPopUp* PopUp);
 
 	FGridSlotEvent GridSlotClicked;
 	FGridSlotEvent GridSlotHovered;
@@ -48,12 +51,13 @@ private:
 	TObjectPtr<UImage> Image_GridSlot;
 
 	int32 TileIndex{INDEX_NONE};
-	int32 StackCount{0};
 	int32 UpperLeftIndex{INDEX_NONE};
+	int32 StackCount{0};
 
 	bool bIsAvailable{true};
 
 	TWeakObjectPtr<UINV_InventoryItem> InventoryItem;
+	TWeakObjectPtr<UINV_ItemPopUp> ItemPopUp;
 
 	EINV_GridSlotState GridSlotState = EINV_GridSlotState::Occupied;
 
@@ -67,7 +71,8 @@ private:
 	FSlateBrush Brush_GreyedOut;
 
 
-
+	UFUNCTION()
+	void OnItemPopUpDestruct(UUserWidget* Menu);
 
 public:
 	FORCEINLINE void SetTileIndex(int32 Index) { TileIndex = Index; }

@@ -3,6 +3,7 @@
 
 #include "Widgets/Inventory/GridSlots/INV_GridSlot.h"
 #include "Items/INV_InventoryItem.h"
+#include "Widgets/ItemPopUp/INV_ItemPopUp.h"
 #include "Components/Image.h"
 
 
@@ -50,4 +51,21 @@ void UINV_GridSlot::SetGreyedOutTexture()
 void UINV_GridSlot::SetInventoryItem(UINV_InventoryItem* Item)
 {
 	{ InventoryItem = Item; }
+}
+
+UINV_ItemPopUp* UINV_GridSlot::GetItemPopUp() const
+{
+	return ItemPopUp.Get();
+}
+
+void UINV_GridSlot::SetItemPopUp(UINV_ItemPopUp* PopUp)
+{
+	ItemPopUp = PopUp;
+	ItemPopUp->SetGridIndex(GetTileIndex());
+	ItemPopUp->OnNativeDestruct.AddUObject(this, &ThisClass::OnItemPopUpDestruct);
+}
+
+void UINV_GridSlot::OnItemPopUpDestruct(UUserWidget* Menu)
+{
+	ItemPopUp.Reset();
 }
