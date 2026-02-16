@@ -855,8 +855,23 @@ void UINV_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEven
 	}
 }
 
-void UINV_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmout, int32 Index)
+void UINV_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmount, int32 Index)
 {
+	UINV_InventoryItem* RightClickedItem = GridSlots[Index]->GetInventoryItem().Get();
+
+	if (!IsValid(RightClickedItem)) return;
+	if (!RightClickedItem->IsStackable()) return;
+
+	const int32 UpperLeftIndex = GridSlots[Index]->GetUpperLeftIndex();
+	UINV_GridSlot* UpperLeftGridSlot = GridSlots[UpperLeftIndex];
+	const int32 StackCount = UpperLeftGridSlot->GetStackCount();
+	const int32 NewStackCount = StackCount - SplitAmount;
+
+	UpperLeftGridSlot->SetStackCount(NewStackCount);
+	SlottedItems.FindChecked(UpperLeftIndex)->UpdateStackCount(NewStackCount);
+
+	AssignHoverItem(RightClickedItem, UpperLeftIndex, UpperLeftIndex);
+	HoverItem->UpdateStackCount(SplitAmount);
 }
 
 void UINV_InventoryGrid::OnPopUpMenuDrop(int32 Index)
