@@ -170,6 +170,8 @@ private:
 	UFUNCTION()
 	void OnPopUpMenuConsume(int32 Index);
 
+	void DropItem();
+
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UUserWidget> VisibleCursorWidgetClass;
 

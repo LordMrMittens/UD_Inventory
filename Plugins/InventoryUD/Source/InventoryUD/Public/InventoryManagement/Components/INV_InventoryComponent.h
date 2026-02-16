@@ -36,11 +36,15 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_AddStacksToItem(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
 
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem(UINV_InventoryItem* Item, int32 StackCount);
+
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
 
 	void AddRepSubObject(UObject* SubObj);
 
+	void SpawnDroppedItem(UINV_InventoryItem* Item, int32 StackCount);
 
 	FInventoryItemChange OnItemAdded;
 	FInventoryItemChange OnItemRemoved; 
@@ -70,8 +74,19 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UINV_InventoryBase> InventoryMenuClass;
 
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float DropSpawnAngleMin{ -85.0f };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float DropSpawnAngleMax{ 85.0f };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float DropSpawnDistanceMin{ 15.0f };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float DropSpawnDistanceMax{ 50.0f };
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float RelativeSpawnElevation{ -70.0f };
 	bool bInventoryMenuOpen;
 	
-		
+	
 
 };

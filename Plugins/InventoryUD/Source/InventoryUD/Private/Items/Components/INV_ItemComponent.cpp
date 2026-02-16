@@ -24,3 +24,8 @@ void UINV_ItemComponent::PickedUp()
 	GetOwner()->Destroy();
 }
 
+void UINV_ItemComponent::InitItemManifest(FINV_ItemManifest CopyOfManifest)
+{
+	ItemManifest = CopyOfManifest;
+}
+

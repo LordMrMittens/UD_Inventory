@@ -876,10 +876,26 @@ void UINV_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmount, int32 Index)
 
 void UINV_InventoryGrid::OnPopUpMenuDrop(int32 Index)
 {
+	UINV_InventoryItem* RightClickedItem = GridSlots[Index]->GetInventoryItem().Get();
+
+	if(!IsValid(RightClickedItem)) return;
+	PickUp(RightClickedItem, Index);
+	DropItem();
+}
+
+void UINV_InventoryGrid::DropItem()
+{
+	if (!IsValid(HoverItem)) return;
+	if (!IsValid(HoverItem->GetInventoryItem())) return;
+
+
+	ClearHoverItem();
+	ShowCursor();
 }
 
 void UINV_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 {
+
 }
 
 bool UINV_InventoryGrid::MatchesCategory(const UINV_InventoryItem* Item) const

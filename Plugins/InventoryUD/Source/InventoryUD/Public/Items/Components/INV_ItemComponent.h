@@ -19,6 +19,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void PickedUp();
+
+	
+	void InitItemManifest(FINV_ItemManifest CopyOfManifest); //Old item references being destroyed so it has to be copied
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Inventory")
 	void OnPickedUp();
