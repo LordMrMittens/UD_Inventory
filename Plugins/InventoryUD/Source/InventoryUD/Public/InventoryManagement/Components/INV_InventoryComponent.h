@@ -39,6 +39,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_DropItem(UINV_InventoryItem* Item, int32 StackCount);
 
+	UFUNCTION(Server, Reliable)
+	void Server_ConsumeItem(UINV_InventoryItem* Item);
+
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
 

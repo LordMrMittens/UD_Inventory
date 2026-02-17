@@ -896,7 +896,21 @@ void UINV_InventoryGrid::DropItem()
 
 void UINV_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 {
+	UINV_InventoryItem* RightClickedItem = GridSlots[Index]->GetInventoryItem().Get();
+	if (!IsValid(RightClickedItem));
 
+	const int32 UpperLeftIndex = GridSlots[Index]->GetUpperLeftIndex();
+	UINV_GridSlot* UpperLeftGridSlot = GridSlots[UpperLeftIndex];
+
+	const int32 NewStackCount = UpperLeftGridSlot->GetStackCount() - 1;
+	UpperLeftGridSlot->SetStackCount(NewStackCount);
+	SlottedItems.FindChecked(UpperLeftIndex)->UpdateStackCount(NewStackCount);
+
+	InventoryComponent->Server_ConsumeItem(RightClickedItem);
+
+	if (NewStackCount <= 0) {
+		RemoveItemFromGrid(RightClickedItem, Index);
+	}
 }
 
 bool UINV_InventoryGrid::MatchesCategory(const UINV_InventoryItem* Item) const
