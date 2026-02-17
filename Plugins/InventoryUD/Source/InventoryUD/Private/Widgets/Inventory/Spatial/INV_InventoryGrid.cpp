@@ -897,7 +897,7 @@ void UINV_InventoryGrid::DropItem()
 void UINV_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 {
 	UINV_InventoryItem* RightClickedItem = GridSlots[Index]->GetInventoryItem().Get();
-	if (!IsValid(RightClickedItem));
+	if (!IsValid(RightClickedItem)) return;
 
 	const int32 UpperLeftIndex = GridSlots[Index]->GetUpperLeftIndex();
 	UINV_GridSlot* UpperLeftGridSlot = GridSlots[UpperLeftIndex];
