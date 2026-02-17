@@ -43,6 +43,8 @@ public:
 	void HideCursor();
 	void SetOwningCanvasPanel(UCanvasPanel* CanvasPanel);
 
+	void DropItem();
+
 private:
 
 	void ConstructGrid();
@@ -170,7 +172,7 @@ private:
 	UFUNCTION()
 	void OnPopUpMenuConsume(int32 Index);
 
-	void DropItem();
+	
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UUserWidget> VisibleCursorWidgetClass;
