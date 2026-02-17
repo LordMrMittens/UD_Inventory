@@ -901,8 +901,8 @@ void UINV_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 
 	const int32 UpperLeftIndex = GridSlots[Index]->GetUpperLeftIndex();
 	UINV_GridSlot* UpperLeftGridSlot = GridSlots[UpperLeftIndex];
-
 	const int32 NewStackCount = UpperLeftGridSlot->GetStackCount() - 1;
+
 	UpperLeftGridSlot->SetStackCount(NewStackCount);
 	SlottedItems.FindChecked(UpperLeftIndex)->UpdateStackCount(NewStackCount);
 

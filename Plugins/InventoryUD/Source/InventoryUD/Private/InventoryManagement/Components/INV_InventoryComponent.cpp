@@ -139,6 +139,9 @@ void UINV_InventoryComponent::Server_ConsumeItem_Implementation(UINV_InventoryIt
 		Item->SetTotalStackCount(NewStackCount);
 	}
 
+	if (FINV_ConsumableFragment* ConsumableFragment = Item->GetItemManifestMutable().GetFragmentOfTypeMutable<FINV_ConsumableFragment>()) {
+		ConsumableFragment->OnConsume(OwningController.Get());
+	}
 
 }
 
