@@ -49,6 +49,8 @@ public:
 
 	void SpawnDroppedItem(UINV_InventoryItem* Item, int32 StackCount);
 
+
+
 	FInventoryItemChange OnItemAdded;
 	FInventoryItemChange OnItemRemoved; 
 	FNoRoomInInventory OnNoRoomInInventory;
@@ -90,6 +92,8 @@ private:
 	float RelativeSpawnElevation{ 70.0f };
 	bool bInventoryMenuOpen;
 	
-	
+public:
+
+	UINV_InventoryBase* GetInventoryMenu() const { return InventoryMenu; }
 
 };

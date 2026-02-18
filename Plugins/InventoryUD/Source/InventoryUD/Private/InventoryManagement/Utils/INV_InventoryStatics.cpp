@@ -3,6 +3,7 @@
 
 #include "InventoryManagement/Utils/INV_InventoryStatics.h"
 #include "Items/Components/INV_ItemComponent.h"
+#include "Widgets/Inventory/InventoryBase/INV_InventoryBase.h"
 #include "Types/INV_GridTypes.h"
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 
@@ -18,4 +19,27 @@ EINV_ItemCategory UINV_InventoryStatics::GetCategoryFromItemComponent(const UINV
 {
 	if (!IsValid(ItemComponent)) return EINV_ItemCategory::None ;
 	return ItemComponent->GetItemManifest().GetItemCategory();
+}
+
+void UINV_InventoryStatics::ItemHovered(APlayerController* PC, UINV_InventoryItem* Item)
+{
+	UINV_InventoryComponent* IC = GetInventoryComponent(PC);
+	if (!IsValid(IC)) return;
+	UINV_InventoryBase* InventoryBase = IC->GetInventoryMenu();
+	if (!IsValid(InventoryBase)) return;
+	if (InventoryBase->HasHoverItem()) return;
+
+	InventoryBase->OnItemHovered(Item);
+
+}
+
+void UINV_InventoryStatics::ItemUnhovered(APlayerController* PC)
+{
+	UINV_InventoryComponent* IC = GetInventoryComponent(PC);
+	if (!IsValid(IC)) return;
+	UINV_InventoryBase* InventoryBase = IC->GetInventoryMenu();
+	if (!IsValid(InventoryBase)) return;
+
+	InventoryBase->OnItemUnhovered();
+
 }

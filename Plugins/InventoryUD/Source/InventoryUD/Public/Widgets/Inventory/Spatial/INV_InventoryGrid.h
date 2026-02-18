@@ -45,6 +45,8 @@ public:
 
 	void DropItem();
 
+	bool HasHoverItem() const;
+
 private:
 
 	void ConstructGrid();

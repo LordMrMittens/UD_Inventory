@@ -50,6 +50,23 @@ FINV_SlotAvailabilityResult UINV_SpatialInventory::HasRoomForItem(UINV_ItemCompo
 	}
 }
 
+void UINV_SpatialInventory::OnItemHovered(UINV_InventoryItem* Item)
+{
+}
+
+void UINV_SpatialInventory::OnItemUnhovered()
+{
+}
+
+bool UINV_SpatialInventory::HasHoverItem() const
+{
+	if (GridEquippables->HasHoverItem()) return true;
+	if (GridConsumables->HasHoverItem()) return true;
+	if (GridCraftables->HasHoverItem()) return true;
+	
+	return false;
+}
+
 void UINV_SpatialInventory::ShowEquippables()
 {
 	SetActiveGrid(GridEquippables, Button_Equippables);

@@ -3,6 +3,7 @@
 
 #include "Widgets/SlottedItems/INV_SlottedItem.h"
 #include "Items/INV_InventoryItem.h"
+#include "InventoryManagement/Utils/INV_InventoryStatics.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
@@ -12,6 +13,16 @@ FReply UINV_SlottedItem::NativeOnMouseButtonDown(const FGeometry& MyGeometry, co
 
 
 	return FReply::Handled();
+}
+
+void UINV_SlottedItem::NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+	UINV_InventoryStatics::ItemHovered(GetOwningPlayer(), InventoryItem.Get());
+}
+
+void UINV_SlottedItem::NativeOnMouseLeave(const FPointerEvent& MouseEvent)
+{
+	UINV_InventoryStatics::ItemUnhovered(GetOwningPlayer());
 }
 
 void UINV_SlottedItem::SetImageBrush(const FSlateBrush& Brush) const

@@ -42,6 +42,10 @@ void UINV_InventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 	}
 	UpdateTileParameters(CanvasPos, MousePos);
 }
+bool UINV_InventoryGrid::HasHoverItem() const
+{
+	return IsValid(HoverItem);
+}
 
 void UINV_InventoryGrid::UpdateTileParameters(const FVector2D& WidgetPosition, const FVector2D& MousePosition) 
 {

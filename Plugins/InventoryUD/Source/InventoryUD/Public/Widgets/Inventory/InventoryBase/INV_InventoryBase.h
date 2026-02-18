@@ -8,6 +8,7 @@
 #include "INV_InventoryBase.generated.h"
 
 class UINV_ItemComponent;
+class UINV_InventoryItem;
 /**
  * 
  */
@@ -17,6 +18,7 @@ class INVENTORYUD_API UINV_InventoryBase : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual FINV_SlotAvailabilityResult HasRoomForItem(UINV_ItemComponent* ItemComponent) const { return FINV_SlotAvailabilityResult(); }
-	
-	
+	virtual void OnItemHovered(UINV_InventoryItem* Item) {}
+	virtual void OnItemUnhovered() {}
+	virtual bool HasHoverItem() const { return false; }
 };

@@ -26,6 +26,12 @@ public:
 
 	virtual FINV_SlotAvailabilityResult HasRoomForItem(UINV_ItemComponent* ItemComponent) const override;
 
+	virtual void OnItemHovered(UINV_InventoryItem* Item) override;
+
+	virtual void OnItemUnhovered() override;
+
+	virtual bool HasHoverItem() const override;
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;

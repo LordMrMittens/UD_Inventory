@@ -23,6 +23,9 @@ public:
 	FSlottedItemClicked OnSlottedItemClicked;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& MouseEvent) override;
+
 
 	void SetImageBrush(const FSlateBrush& Brush) const;
 	void SetInventoryItem(UINV_InventoryItem* Item);

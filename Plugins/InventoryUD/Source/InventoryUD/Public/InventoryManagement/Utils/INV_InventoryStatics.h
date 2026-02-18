@@ -9,6 +9,7 @@
 
 class UINV_InventoryComponent;
 class UINV_ItemComponent;
+class UINV_InventoryItem;
 /**
  * 
  */
@@ -23,6 +24,12 @@ public:
 	static UINV_InventoryComponent* GetInventoryComponent(const APlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static EINV_ItemCategory GetCategoryFromItemComponent(const UINV_ItemComponent* ItemComponent);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static void ItemHovered(APlayerController* PC, UINV_InventoryItem* Item);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static void ItemUnhovered(APlayerController* PC);
 	
 	template<typename T, typename FuncT>
 	static void ForEach2D(TArray<T>& Array, int32 Index, const FIntPoint& Range2D, int32 GridColumns, const FuncT& Function);
