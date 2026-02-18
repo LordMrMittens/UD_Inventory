@@ -7,6 +7,7 @@
 #include "INV_SpatialInventory.generated.h"
 
 class UINV_InventoryGrid;
+class UINV_ItemDescription;
 class UWidgetSwitcher;
 class UButton;
 class UCanvasPanel;
@@ -22,6 +23,8 @@ public:
 
 	virtual void NativeOnInitialized() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
 	virtual FINV_SlotAvailabilityResult HasRoomForItem(UINV_ItemComponent* ItemComponent) const override;
@@ -31,6 +34,8 @@ public:
 	virtual void OnItemUnhovered() override;
 
 	virtual bool HasHoverItem() const override;
+
+	UINV_ItemDescription* GetItemDescription();
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -52,6 +57,20 @@ private:
 	TObjectPtr<UButton> Button_Craftables;
 
 	TWeakObjectPtr<UINV_InventoryGrid> ActiveGrid;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<UINV_ItemDescription> ItemDescriptionClass;
+
+	UPROPERTY()
+	TObjectPtr<UINV_ItemDescription> ItemDescription;
+
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float ItemDescriptionDelay{ 0.5f };
+
+	FTimerHandle ItemDescriptionHandle;
+
+	void SetItemDescriptionSizeAndPosition(UINV_ItemDescription* Description, UCanvasPanel* Canvas)const;
 
 	UFUNCTION()
 	void ShowEquippables();

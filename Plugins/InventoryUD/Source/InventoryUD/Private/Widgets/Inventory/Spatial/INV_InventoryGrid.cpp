@@ -355,6 +355,7 @@ void UINV_InventoryGrid::AddStacks(const FINV_SlotAvailabilityResult& Result)
 
 void UINV_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
 {
+	UINV_InventoryStatics::ItemUnhovered(GetOwningPlayer());
 	check(GridSlots.IsValidIndex(GridIndex));
 	UINV_InventoryItem* ClickedInventoryItem = GridSlots[GridIndex]->GetInventoryItem().Get();
 	if (!IsValid(HoverItem) && IsLeftClick(MouseEvent)) 

@@ -2,6 +2,10 @@
 
 
 #include "Widgets/Inventory/Spatial/INV_SpatialInventory.h"
+#include "Widgets/ItemDescription/INV_ItemDescription.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "InventoryUD.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
@@ -22,6 +26,31 @@ void UINV_SpatialInventory::NativeOnInitialized()
 	GridCraftables->SetOwningCanvasPanel(CanvasPanel);
 
 	ShowEquippables();
+}
+
+void UINV_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (!IsValid(ItemDescription)) return;
+
+	SetItemDescriptionSizeAndPosition(ItemDescription, CanvasPanel);
+}
+
+void UINV_SpatialInventory::SetItemDescriptionSizeAndPosition(UINV_ItemDescription* Description, UCanvasPanel* Canvas) const
+{
+	UCanvasPanelSlot* ItemDescriptionCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Description);
+	if (!IsValid(ItemDescriptionCPS)) return;
+
+	const FVector2D ItemDescriptionSize = Description->GetBoxSize();
+	ItemDescriptionCPS->SetSize(ItemDescriptionSize);
+
+	FVector2D ClampedPosition = UINV_WidgetUtils::GetClampedWidgetPosition(
+		UINV_WidgetUtils::GetWidgetSize(Canvas), 
+		ItemDescriptionSize, 
+		UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer()));
+
+	ItemDescriptionCPS->SetPosition(ClampedPosition);
 }
 
 FReply UINV_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
@@ -52,10 +81,22 @@ FINV_SlotAvailabilityResult UINV_SpatialInventory::HasRoomForItem(UINV_ItemCompo
 
 void UINV_SpatialInventory::OnItemHovered(UINV_InventoryItem* Item)
 {
+	UINV_ItemDescription* DescriptionWidget = GetItemDescription();
+	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(ItemDescriptionHandle);
+	FTimerDelegate DescriptionTimerDelegate;
+	DescriptionTimerDelegate.BindLambda([this]() {
+
+		GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
+		});
+	GetOwningPlayer()->GetWorldTimerManager().SetTimer(ItemDescriptionHandle, DescriptionTimerDelegate, ItemDescriptionDelay, false);
 }
 
 void UINV_SpatialInventory::OnItemUnhovered()
 {
+	UINV_ItemDescription* DescriptionWidget = GetItemDescription();
+	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(ItemDescriptionHandle);
 }
 
 bool UINV_SpatialInventory::HasHoverItem() const
@@ -66,6 +107,18 @@ bool UINV_SpatialInventory::HasHoverItem() const
 	
 	return false;
 }
+
+UINV_ItemDescription* UINV_SpatialInventory::GetItemDescription()
+{
+	if (!IsValid(ItemDescription)) {
+		ItemDescription = CreateWidget<UINV_ItemDescription>(GetOwningPlayer(), ItemDescriptionClass);
+		CanvasPanel->AddChild(ItemDescription);
+	}
+	
+	return ItemDescription;
+}
+
+
 
 void UINV_SpatialInventory::ShowEquippables()
 {
