@@ -11,6 +11,7 @@
 
 
 class UINV_InventoryItem;
+class UINV_CompositeBase;
 struct FINV_ItemFragment;
 /**
  * 
@@ -30,7 +31,12 @@ public:
 	template<typename T> requires std::derived_from<T, FINV_ItemFragment>
 	T* GetFragmentOfTypeMutable();
 
+	template<typename T> requires std::derived_from<T, FINV_ItemFragment>
+	TArray<const T*> GetAllFragmentsOfType() const;
+
 	void SpawnPickupActor(const UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+
+	void AssimilateInventoryFragments(UINV_CompositeBase* Composite) const;
 
 private:
 
@@ -95,4 +101,18 @@ inline T* FINV_ItemManifest::GetFragmentOfTypeMutable()
 	}
 
 	return nullptr;
-};
+}
+template<typename T> requires std::derived_from<T, FINV_ItemFragment>
+TArray<const T*> FINV_ItemManifest::GetAllFragmentsOfType() const
+{
+	TArray<const T*> Result;
+	for (const TInstancedStruct<FINV_ItemFragment>& Fragment : ItemFragments) 
+	{
+		if (const T* FragmentPtr = Fragment.GetPtr<T>())
+		{
+			Result.Add(FragmentPtr);
+		}
+	}
+	return Result;
+}
+;

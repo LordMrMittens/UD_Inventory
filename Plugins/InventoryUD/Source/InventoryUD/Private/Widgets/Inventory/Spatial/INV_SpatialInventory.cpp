@@ -10,6 +10,8 @@
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "Items/Components/INV_ItemComponent.h"
+#include "Items/INV_InventoryItem.h"
+#include "Items/Manifest/INV_ItemManifest.h"
 #include "InventoryManagement/Utils/INV_InventoryStatics.h"
 #include "Widgets/Inventory/Spatial/INV_InventoryGrid.h"
 
@@ -81,13 +83,16 @@ FINV_SlotAvailabilityResult UINV_SpatialInventory::HasRoomForItem(UINV_ItemCompo
 
 void UINV_SpatialInventory::OnItemHovered(UINV_InventoryItem* Item)
 {
+	const auto& Manifest = Item->GetItemManifest();
 	UINV_ItemDescription* DescriptionWidget = GetItemDescription();
 	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(ItemDescriptionHandle);
 	FTimerDelegate DescriptionTimerDelegate;
-	DescriptionTimerDelegate.BindLambda([this]() {
+	DescriptionTimerDelegate.BindLambda([this, &Manifest, DescriptionWidget]() {
 
+		Manifest.AssimilateInventoryFragments(DescriptionWidget);
 		GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
+		//Assimilate manifest indo item description
 		});
 	GetOwningPlayer()->GetWorldTimerManager().SetTimer(ItemDescriptionHandle, DescriptionTimerDelegate, ItemDescriptionDelay, false);
 }

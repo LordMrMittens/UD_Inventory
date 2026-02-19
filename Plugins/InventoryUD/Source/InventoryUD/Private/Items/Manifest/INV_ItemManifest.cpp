@@ -2,6 +2,9 @@
 #include "Items/Manifest/INV_ItemManifest.h"
 #include "Items/Components/INV_ItemComponent.h"
 #include "Items/INV_InventoryItem.h"
+#include "Items/Fragments/INV_ItemFragment.h"
+#include "Widgets/Composite/INV_CompositeBase.h"
+
 
 void FINV_ItemManifest::SpawnPickupActor(const UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
@@ -19,4 +22,16 @@ UINV_InventoryItem* FINV_ItemManifest::Manifest(UObject* NewOuter)
 	UINV_InventoryItem* Item = NewObject<UINV_InventoryItem>(NewOuter, UINV_InventoryItem::StaticClass());
 	Item->SetItemManifest(*this);
 	return Item;
+}
+
+void FINV_ItemManifest::AssimilateInventoryFragments(UINV_CompositeBase* Composite) const {
+
+	const auto& InventoryItemFragments = GetAllFragmentsOfType<FINV_InventoryItemFragment>();
+	for (const auto& Fragment : InventoryItemFragments)
+	{
+		Composite->ApplyFunction([Fragment](UINV_CompositeBase* Widget) {
+			Fragment->Assimilate(Widget);
+			});
+
+	}
 }

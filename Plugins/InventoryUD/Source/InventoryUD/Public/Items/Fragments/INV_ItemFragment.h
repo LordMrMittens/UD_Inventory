@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-
 #include "INV_ItemFragment.generated.h"
 
 class APlayerController;
+class UINV_CompositeBase;
 
 
 USTRUCT(BlueprintType)
@@ -30,6 +30,20 @@ public:
 	FGameplayTag GetFragmentTag() const { return FragmentTag; }
 	void SetFragmentTag(FGameplayTag Tag) { FragmentTag = Tag; }
 };
+
+/*
+* Fragment for assimilation into widget
+*/
+USTRUCT(BlueprintType)
+struct FINV_InventoryItemFragment : public FINV_ItemFragment
+{
+	GENERATED_BODY()
+public:
+	virtual void Assimilate(UINV_CompositeBase* Composite) const;
+protected:
+	bool MatchesWidgetTag(const UINV_CompositeBase* Composite) const;
+};
+
 USTRUCT(BlueprintType)
 struct FINV_GridFragment : public FINV_ItemFragment
 {
