@@ -65,7 +65,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FINV_ImageFragment : public FINV_ItemFragment
+struct FINV_ImageFragment : public FINV_InventoryItemFragment
 {
 	GENERATED_BODY()
 
@@ -76,6 +76,7 @@ private:
 	FVector2D IconDimensions{ 44.f,44.f };
 public:
 	UTexture2D* GetIcon() const { return Icon; }
+	virtual void Assimilate(UINV_CompositeBase* Composite) const override;
 
 };
 

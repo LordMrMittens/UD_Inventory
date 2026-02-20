@@ -25,6 +25,7 @@ public:
 	virtual void ApplyFunction(FuncType Function) {}
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Inventory")
 	FGameplayTag FragmentTag;
 
 public:
