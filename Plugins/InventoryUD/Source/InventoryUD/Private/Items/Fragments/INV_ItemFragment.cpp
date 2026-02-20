@@ -3,6 +3,7 @@
 
 #include "Items/Fragments/INV_ItemFragment.h"
 #include "Widgets/Composite/INV_Leaf_Image.h"
+#include "Widgets/Composite/INV_Leaf_Text.h"
 #include "Widgets/Composite/INV_CompositeBase.h"
 
 void FINV_InventoryItemFragment::Assimilate(UINV_CompositeBase* Composite) const
@@ -37,4 +38,14 @@ void FINV_ImageFragment::Assimilate(UINV_CompositeBase* Composite) const
 	Image->SetImage(Icon);
 	Image->SetBoxSize(IconDimensions);
 	Image->SetImageSize(IconDimensions);
+}
+
+void FINV_TextFragment::Assimilate(UINV_CompositeBase* Composite) const
+{
+	FINV_InventoryItemFragment::Assimilate(Composite);
+	if (!MatchesWidgetTag(Composite)) return;
+	UINV_Leaf_Text* LeafText = Cast<UINV_Leaf_Text>(Composite);
+	if (!IsValid(LeafText)) return;
+
+	LeafText->SetLeafText(FragmentText);
 }
