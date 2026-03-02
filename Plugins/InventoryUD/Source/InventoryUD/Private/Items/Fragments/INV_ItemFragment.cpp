@@ -4,6 +4,7 @@
 #include "Items/Fragments/INV_ItemFragment.h"
 #include "Widgets/Composite/INV_Leaf_Image.h"
 #include "Widgets/Composite/INV_Leaf_Text.h"
+#include "Widgets/Composite/INV_Leaf_LabeledValue.h"
 #include "Widgets/Composite/INV_CompositeBase.h"
 
 void FINV_InventoryItemFragment::Assimilate(UINV_CompositeBase* Composite) const
@@ -48,4 +49,26 @@ void FINV_TextFragment::Assimilate(UINV_CompositeBase* Composite) const
 	if (!IsValid(LeafText)) return;
 
 	LeafText->SetLeafText(FragmentText);
+}
+
+void FINV_LabeledNumberFragment::Assimilate(UINV_CompositeBase* Composite) const
+{
+	FINV_InventoryItemFragment::Assimilate(Composite);
+	if (!MatchesWidgetTag(Composite)) return;
+	UINV_Leaf_LabeledValue* LeafTextLabeledValue = Cast<UINV_Leaf_LabeledValue>(Composite);
+	if (!IsValid(LeafTextLabeledValue)) return;
+	LeafTextLabeledValue->SetText_Label(Text_Label, bCollapseLabel);
+	FNumberFormattingOptions Options;
+	Options.MinimumFractionalDigits = MinFractionalDigits;
+	Options.MaximumFractionalDigits = MaxFractionalDigits;
+	LeafTextLabeledValue->SetText_Value(FText::AsNumber(Value, &Options), bCollapseValue);
+}
+
+void FINV_LabeledNumberFragment::Manifest()
+{
+	FINV_InventoryItemFragment::Manifest();
+	if (bRandomiseOnManifest) {
+		Value = FMath::RandRange(MinValue, MaxValue);
+	}
+		bRandomiseOnManifest = false;
 }

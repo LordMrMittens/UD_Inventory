@@ -34,6 +34,8 @@ public:
 	template<typename T> requires std::derived_from<T, FINV_ItemFragment>
 	TArray<const T*> GetAllFragmentsOfType() const;
 
+	TArray<TInstancedStruct<FINV_ItemFragment>>& GetFragmentsMutable() { return ItemFragments; }
+
 	void SpawnPickupActor(const UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation);
 
 	void AssimilateInventoryFragments(UINV_CompositeBase* Composite) const;
@@ -52,6 +54,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<AActor> PickupActorClass;
 	
+	void ClearFragments();
 
 public:
 

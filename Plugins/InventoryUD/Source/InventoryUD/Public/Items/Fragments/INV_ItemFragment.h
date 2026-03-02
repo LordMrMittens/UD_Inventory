@@ -27,6 +27,8 @@ private:
 	FGameplayTag FragmentTag = FGameplayTag::EmptyTag;
 
 public:
+
+	virtual void Manifest() {}
 	FGameplayTag GetFragmentTag() const { return FragmentTag; }
 	void SetFragmentTag(FGameplayTag Tag) { FragmentTag = Tag; }
 };
@@ -93,6 +95,37 @@ private:
 public:
 	void SetText(const FText& Text) { FragmentText = Text; }
 	FText GetText() const { return FragmentText; }
+};
+USTRUCT(BlueprintType)
+struct FINV_LabeledNumberFragment : public FINV_InventoryItemFragment
+{
+	GENERATED_BODY()
+public:
+	virtual void Assimilate(UINV_CompositeBase* Composite) const override;
+
+	virtual void Manifest() override;
+
+	//when manifesting for the first time this fragment randomises, it should then retain the same value
+	bool bRandomiseOnManifest{ true };
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	FText Text_Label{};
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	float Value{0.f};
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float MinValue{0.f};
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	float MaxValue{10.f};
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	bool bCollapseLabel{ false };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	bool bCollapseValue{ false };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 MinFractionalDigits{ 1 };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 MaxFractionalDigits{ 1 };
 };
 
 USTRUCT(BlueprintType)
