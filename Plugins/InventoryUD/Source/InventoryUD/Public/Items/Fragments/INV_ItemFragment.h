@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "StructUtils/InstancedStruct.h"
 #include "INV_ItemFragment.generated.h"
 
 class APlayerController;
@@ -67,6 +68,27 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FINV_StackableFragment : public FINV_ItemFragment
+{
+	GENERATED_BODY()
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 MaxStackSize{ 10 };
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	int32 StackCount{ 1 };
+
+public:
+
+	int32 GetMaxStackSize() const { return MaxStackSize; }
+	int32 GetStackCount() const { return StackCount; }
+	void SetStackCount(int32 Count) { StackCount = Count; }
+
+};
+
+//Inventory Item Fragments
+
+USTRUCT(BlueprintType)
 struct FINV_ImageFragment : public FINV_InventoryItemFragment
 {
 	GENERATED_BODY()
@@ -126,41 +148,43 @@ private:
 	int32 MinFractionalDigits{ 1 };
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 MaxFractionalDigits{ 1 };
-};
-
-USTRUCT(BlueprintType)
-struct FINV_StackableFragment : public FINV_ItemFragment
-{
-	GENERATED_BODY()
-
-private:
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	int32 MaxStackSize{ 10 };
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	int32 StackCount{ 1 };
-
 public:
-	
-	int32 GetMaxStackSize() const { return MaxStackSize; }
-	int32 GetStackCount() const { return StackCount; }
-	void SetStackCount(int32 Count) { StackCount = Count; }
-
+	float GetValue() const { return Value; }
 };
 
+
+//Consume fragments
+
 USTRUCT(BlueprintType)
-struct FINV_ConsumableFragment : public FINV_ItemFragment
+struct FINV_ConsumeModifier : public FINV_LabeledNumberFragment
 {
 	GENERATED_BODY()
 
 public:
 
 	virtual void OnConsume(APlayerController* PlayerController) {}
+};
 
+
+USTRUCT(BlueprintType)
+struct FINV_ConsumableFragment : public FINV_InventoryItemFragment
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Assimilate(UINV_CompositeBase* Composite) const override;
+	virtual void OnConsume(APlayerController* PlayerController);
+	virtual void Manifest() override;
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Inventory", meta = (ExcludeBaseStruct))
+	TArray<TInstancedStruct<FINV_ConsumeModifier>> ConsumeModifiers;
 
 };
 
 USTRUCT(BlueprintType)
-struct FINV_HealthPotionFragment : public FINV_ConsumableFragment
+struct FINV_HealthPotionFragment : public FINV_ConsumeModifier
 {
 	GENERATED_BODY()
 
@@ -168,20 +192,15 @@ public:
 
 	virtual void OnConsume(APlayerController* PlayerController) override;
 
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	float HealthAmount{ 20.0f };
 
 };
 USTRUCT(BlueprintType)
-struct FINV_ManaPotionFragment : public FINV_ConsumableFragment
+struct FINV_ManaPotionFragment : public FINV_ConsumeModifier
 {
 	GENERATED_BODY()
 
 public:
 
 	virtual void OnConsume(APlayerController* PlayerController) override;
-
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	float ManaAmount{ 20.0f };
 
 };

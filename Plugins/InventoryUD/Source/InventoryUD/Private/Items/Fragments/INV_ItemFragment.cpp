@@ -16,18 +16,19 @@ void FINV_InventoryItemFragment::Assimilate(UINV_CompositeBase* Composite) const
 bool FINV_InventoryItemFragment::MatchesWidgetTag(const UINV_CompositeBase* Composite) const
 {
 
-	return Composite->GetFragmentTag().MatchesTagExact(Composite->GetFragmentTag());
+	return GetFragmentTag().MatchesTagExact(Composite->GetFragmentTag());
 }
+
 
 void FINV_HealthPotionFragment::OnConsume(APlayerController* PlayerController)
 {
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Health Potion Consumed!Healed %f HP"), HealthAmount));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Health Potion Consumed!Healed %f HP"), GetValue()));
 }
 
 void FINV_ManaPotionFragment::OnConsume(APlayerController* PlayerController)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mana Potion Consumed! Replenished %f MP"), ManaAmount));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mana Potion Consumed! Replenished %f MP"), GetValue()));
 }
 
 void FINV_ImageFragment::Assimilate(UINV_CompositeBase* Composite) const
@@ -63,6 +64,32 @@ void FINV_LabeledNumberFragment::Assimilate(UINV_CompositeBase* Composite) const
 	Options.MaximumFractionalDigits = MaxFractionalDigits;
 	LeafTextLabeledValue->SetText_Value(FText::AsNumber(Value, &Options), bCollapseValue);
 }
+void FINV_ConsumableFragment::Assimilate(UINV_CompositeBase* Composite) const
+{
+	FINV_InventoryItemFragment::Assimilate(Composite);
+	for (const auto& Modifier : ConsumeModifiers) 
+	{
+		const auto& ModifierReference = Modifier.Get();
+		ModifierReference.Assimilate(Composite);
+	}
+}
+void FINV_ConsumableFragment::OnConsume(APlayerController* PlayerController)
+{
+	for (auto& Modifier : ConsumeModifiers)
+	{
+		auto& ModifierReference = Modifier.GetMutable();
+		ModifierReference.OnConsume(PlayerController);
+	}
+}
+
+void FINV_ConsumableFragment::Manifest()
+{
+	for (auto& Modifier : ConsumeModifiers)
+	{
+		auto& ModifierReference = Modifier.GetMutable();
+		ModifierReference.Manifest();
+	}
+}
 
 void FINV_LabeledNumberFragment::Manifest()
 {
@@ -72,3 +99,4 @@ void FINV_LabeledNumberFragment::Manifest()
 	}
 		bRandomiseOnManifest = false;
 }
+
