@@ -10,6 +10,10 @@ namespace Fragments
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Consumable, "Fragments.Consumable", "Consumable Fragment Tag")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(ItemName, "Fragments.ItemName", "ItemName Fragment Tag")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(PrimaryStat, "Fragments.PrimaryStat", "PrimaryStat Fragment Tag")
+		UE_DEFINE_GAMEPLAY_TAG(ItemType, "Fragments.ItemType")
+		UE_DEFINE_GAMEPLAY_TAG(FlavourText,"Fragments.FlavourText")
+		UE_DEFINE_GAMEPLAY_TAG(SellValue, "Fragments.SellValue")
+		UE_DEFINE_GAMEPLAY_TAG(RequiredLevel,"Fragments.RequiredLevel")
 
 		namespace StatMod
 	{
