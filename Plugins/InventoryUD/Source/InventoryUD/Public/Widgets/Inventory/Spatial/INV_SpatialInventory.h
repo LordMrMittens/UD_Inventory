@@ -13,6 +13,7 @@ class UINV_HoverItem;
 class UWidgetSwitcher;
 class UButton;
 class UCanvasPanel;
+class FGameplayTag;
 /**
  * 
  */
@@ -90,5 +91,6 @@ private:
 
 	void SetActiveGrid(UINV_InventoryGrid* Grid, UButton* Button);
 	void DisableButton(UButton* Button);
+	bool CanEquipHoverItem(UINV_EquippedGridSlot* EquipGridSlot, const FGameplayTag& EquipmentTypeTag ) const;
 
 };

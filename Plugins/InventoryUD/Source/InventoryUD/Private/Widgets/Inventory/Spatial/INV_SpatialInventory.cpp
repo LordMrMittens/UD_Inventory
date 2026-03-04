@@ -4,6 +4,7 @@
 #include "Widgets/Inventory/Spatial/INV_SpatialInventory.h"
 #include "Widgets/ItemDescription/INV_ItemDescription.h"
 #include "Widgets/Inventory/GridSlots/INV_EquippedGridSlot.h"
+#include "Widgets/Inventory/HoverItem/INV_HoverItem.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
@@ -43,6 +44,10 @@ void UINV_SpatialInventory::NativeOnInitialized()
 void UINV_SpatialInventory::EquippedGridSlotClicked(UINV_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTag)
 {
 
+	if (!CanEquipHoverItem(EquippedGridSlot, EquipmentTag)) return;
+	//Create an equipped slotted item and add it to the equipped GridSlot
+	//Clear Hover Item
+	//Tell server we are equipping something (do we need to unequip something as well? )
 }
 
 void UINV_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -181,4 +186,15 @@ void UINV_SpatialInventory::DisableButton(UButton* Button)
 	Button_Consumables->SetIsEnabled(true);
 	Button_Craftables->SetIsEnabled(true);
 	Button->SetIsEnabled(false);
+}
+
+bool UINV_SpatialInventory::CanEquipHoverItem(UINV_EquippedGridSlot* EquipGridSlot, const FGameplayTag& EquipmentTypeTag) const
+{
+	if (!IsValid(EquipGridSlot) || EquipGridSlot->GetInventoryItem().IsValid()) return false;
+	UINV_HoverItem* HoverItem = GetHoverItem();
+	if (!IsValid(HoverItem)) return false;
+
+	UINV_InventoryItem* HeldItem = HoverItem->GetInventoryItem();
+
+	return HasHoverItem() && IsValid(HeldItem) && !HoverItem->GetIsStackable() && HeldItem->GetItemManifest().GetItemCategory() == EINV_ItemCategory::Equippable;
 }
