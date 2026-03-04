@@ -10,6 +10,7 @@
 class UINV_InventoryComponent;
 class UINV_ItemComponent;
 class UINV_InventoryItem;
+class UINV_HoverItem;
 /**
  * 
  */
@@ -33,6 +34,8 @@ public:
 	
 	template<typename T, typename FuncT>
 	static void ForEach2D(TArray<T>& Array, int32 Index, const FIntPoint& Range2D, int32 GridColumns, const FuncT& Function);
+
+	static UINV_HoverItem* GetHoverItem(APlayerController* PC);
 };
 
 template<typename T, typename FuncT>

@@ -8,6 +8,8 @@
 
 class UINV_InventoryGrid;
 class UINV_ItemDescription;
+class UINV_EquippedGridSlot;
+class UINV_HoverItem;
 class UWidgetSwitcher;
 class UButton;
 class UCanvasPanel;
@@ -34,6 +36,8 @@ public:
 	virtual void OnItemUnhovered() override;
 
 	virtual bool HasHoverItem() const override;
+	
+	virtual UINV_HoverItem* GetHoverItem() const override;
 
 	UINV_ItemDescription* GetItemDescription();
 
@@ -68,6 +72,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	float ItemDescriptionDelay{ 0.5f };
 
+	UPROPERTY()
+	TArray<TObjectPtr<UINV_EquippedGridSlot>> EquippedGridSlots;
+
 	FTimerHandle ItemDescriptionHandle;
 
 	void SetItemDescriptionSizeAndPosition(UINV_ItemDescription* Description, UCanvasPanel* Canvas)const;
@@ -78,6 +85,8 @@ private:
 	void ShowConsumables();	
 	UFUNCTION()
 	void ShowCraftables();
+	UFUNCTION()
+	void EquippedGridSlotClicked(UINV_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTag);
 
 	void SetActiveGrid(UINV_InventoryGrid* Grid, UButton* Button);
 	void DisableButton(UButton* Button);

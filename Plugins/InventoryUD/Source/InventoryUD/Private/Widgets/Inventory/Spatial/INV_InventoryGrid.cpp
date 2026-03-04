@@ -47,6 +47,11 @@ bool UINV_InventoryGrid::HasHoverItem() const
 	return IsValid(HoverItem);
 }
 
+UINV_HoverItem* UINV_InventoryGrid::GetHoverItem()
+{
+	return HoverItem;
+}
+
 void UINV_InventoryGrid::UpdateTileParameters(const FVector2D& WidgetPosition, const FVector2D& MousePosition) 
 {
 	if (!bMouseWithinCanvas) return;

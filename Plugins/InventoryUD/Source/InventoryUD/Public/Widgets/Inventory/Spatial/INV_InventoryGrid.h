@@ -47,6 +47,8 @@ public:
 
 	bool HasHoverItem() const;
 
+	UINV_HoverItem* GetHoverItem();
+
 private:
 
 	void ConstructGrid();

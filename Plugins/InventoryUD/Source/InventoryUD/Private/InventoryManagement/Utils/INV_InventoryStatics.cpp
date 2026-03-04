@@ -43,3 +43,12 @@ void UINV_InventoryStatics::ItemUnhovered(APlayerController* PC)
 	InventoryBase->OnItemUnhovered();
 
 }
+
+UINV_HoverItem* UINV_InventoryStatics::GetHoverItem(APlayerController* PC)
+{
+	UINV_InventoryComponent* IC = GetInventoryComponent(PC);
+	if (!IsValid(IC)) return nullptr;
+	UINV_InventoryBase* InventoryBase = IC->GetInventoryMenu();
+	if (!IsValid(InventoryBase)) return nullptr;
+	return InventoryBase->GetHoverItem();
+}

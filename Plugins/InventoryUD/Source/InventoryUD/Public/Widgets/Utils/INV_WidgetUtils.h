@@ -7,6 +7,7 @@
 #include "INV_WidgetUtils.generated.h"
 
 class UWidget;
+class UINV_HoverItem;
 /**
  * 
  */
