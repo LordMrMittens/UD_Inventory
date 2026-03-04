@@ -204,3 +204,43 @@ public:
 	virtual void OnConsume(APlayerController* PlayerController) override;
 
 };
+
+//Equipment Fragments
+
+USTRUCT(BlueprintType)
+struct FINV_EquipModifier : public FINV_LabeledNumberFragment
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void OnEquip(APlayerController* PlayerController) {}
+	virtual void OnUnequip(APlayerController* PlayerController) {}
+};
+USTRUCT(BlueprintType)
+struct FINV_StrengthModifier : public FINV_EquipModifier
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void OnEquip(APlayerController* PlayerController) override;
+	virtual void OnUnequip(APlayerController* PlayerController) override;
+};
+
+USTRUCT(BlueprintType)
+struct FINV_EquipmentFragment : public FINV_InventoryItemFragment
+{
+	GENERATED_BODY()
+
+public:
+	bool bEquipped{ false };
+	void OnEquip(APlayerController* PlayerController);
+	void OnUnequip(APlayerController* PlayerController);
+	virtual void Assimilate(UINV_CompositeBase* Composite) const override;
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Inventory", meta = (ExcludeBaseStruct))
+	TArray<TInstancedStruct<FINV_EquipModifier>> EquipModifiers;
+
+};

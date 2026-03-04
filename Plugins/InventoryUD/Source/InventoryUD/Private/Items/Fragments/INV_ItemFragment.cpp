@@ -100,3 +100,41 @@ void FINV_LabeledNumberFragment::Manifest()
 		bRandomiseOnManifest = false;
 }
 
+void FINV_StrengthModifier::OnEquip(APlayerController* PlayerController)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Item Equipped Gained %f Strength"), GetValue()));
+}
+
+void FINV_StrengthModifier::OnUnequip(APlayerController* PlayerController)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Item Unequipped Lost %f Strength"), GetValue()));
+}
+
+void FINV_EquipmentFragment::OnEquip(APlayerController* PlayerController) 
+{
+	if (bEquipped) return;
+	bEquipped = true;
+	for (auto& Modifier : EquipModifiers) {
+		auto& ModifierReference = Modifier.GetMutable();
+		ModifierReference.OnEquip(PlayerController);
+	}
+}
+
+void FINV_EquipmentFragment::OnUnequip(APlayerController* PlayerController) 
+{
+	if (!bEquipped) return;
+	bEquipped = false;
+	for (auto& Modifier : EquipModifiers) {
+		auto& ModifierReference = Modifier.GetMutable();
+		ModifierReference.OnUnequip(PlayerController);
+	}
+}
+
+void FINV_EquipmentFragment::Assimilate(UINV_CompositeBase* Composite) const
+{
+	FINV_InventoryItemFragment::Assimilate(Composite);
+	for (const auto& Modifier : EquipModifiers) {
+		const auto& ModifierReference = Modifier.Get();
+		ModifierReference.Assimilate(Composite);
+	}
+}
