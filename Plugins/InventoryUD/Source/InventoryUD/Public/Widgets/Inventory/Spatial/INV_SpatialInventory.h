@@ -13,7 +13,7 @@ class UINV_HoverItem;
 class UWidgetSwitcher;
 class UButton;
 class UCanvasPanel;
-class FGameplayTag;
+struct FGameplayTag;
 /**
  * 
  */
