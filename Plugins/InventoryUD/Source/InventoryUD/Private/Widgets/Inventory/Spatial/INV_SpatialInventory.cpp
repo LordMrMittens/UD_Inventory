@@ -4,6 +4,7 @@
 #include "Widgets/Inventory/Spatial/INV_SpatialInventory.h"
 #include "Widgets/ItemDescription/INV_ItemDescription.h"
 #include "Widgets/Inventory/GridSlots/INV_EquippedGridSlot.h"
+#include "Widgets/SlottedItems/INV_EquippedSlottedItem.h"
 #include "Widgets/Inventory/HoverItem/INV_HoverItem.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
@@ -45,9 +46,22 @@ void UINV_SpatialInventory::EquippedGridSlotClicked(UINV_EquippedGridSlot* Equip
 {
 
 	if (!CanEquipHoverItem(EquippedGridSlot, EquipmentTag)) return;
-	//Create an equipped slotted item and add it to the equipped GridSlot
+	const float TileSize = UINV_InventoryStatics::GetInventoryWidget(GetOwningPlayer())->GetTileSize();
+
+	UINV_HoverItem* HoverItem = GetHoverItem();
+	UINV_EquippedSlottedItem* EquippedSlottedItem = EquippedGridSlot->OnItemEquipped(
+		HoverItem->GetInventoryItem(),
+		EquipmentTag,
+		TileSize
+	);
+	EquippedSlottedItem->OnSlottedItemClicked.AddDynamic(this, &ThisClass::EquippedSlottedItemClicked);
+
 	//Clear Hover Item
 	//Tell server we are equipping something (do we need to unequip something as well? )
+}
+
+void UINV_SpatialInventory::EquippedSlottedItemClicked(UINV_EquippedSlottedItem* EquippedSlottedItem)
+{
 }
 
 void UINV_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -149,6 +163,12 @@ UINV_ItemDescription* UINV_SpatialInventory::GetItemDescription()
 	}
 	
 	return ItemDescription;
+}
+
+float UINV_SpatialInventory::GetTileSize() const
+{
+
+	return GridEquippables->GetTileSize();
 }
 
 

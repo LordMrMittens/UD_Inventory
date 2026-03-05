@@ -249,4 +249,5 @@ private:
 public:
 
 	FORCEINLINE EINV_ItemCategory GetItemCategory() const { return ItemCategory; }
+	FORCEINLINE float GetTileSize() const { return TileSize; }
 };

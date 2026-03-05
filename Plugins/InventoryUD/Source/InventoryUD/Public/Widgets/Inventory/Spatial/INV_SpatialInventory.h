@@ -13,6 +13,7 @@ class UINV_HoverItem;
 class UWidgetSwitcher;
 class UButton;
 class UCanvasPanel;
+class UINV_EquippedSlottedItem;
 struct FGameplayTag;
 /**
  * 
@@ -41,6 +42,8 @@ public:
 	virtual UINV_HoverItem* GetHoverItem() const override;
 
 	UINV_ItemDescription* GetItemDescription();
+
+	virtual float GetTileSize() const override;
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -88,6 +91,8 @@ private:
 	void ShowCraftables();
 	UFUNCTION()
 	void EquippedGridSlotClicked(UINV_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTag);
+	UFUNCTION()
+	void EquippedSlottedItemClicked(UINV_EquippedSlottedItem* EquippedSlottedItem);
 
 	void SetActiveGrid(UINV_InventoryGrid* Grid, UButton* Button);
 	void DisableButton(UButton* Button);

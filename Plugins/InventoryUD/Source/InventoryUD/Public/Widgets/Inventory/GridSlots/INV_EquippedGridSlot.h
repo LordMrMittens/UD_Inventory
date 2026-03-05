@@ -8,6 +8,7 @@
 #include "INV_EquippedGridSlot.generated.h"
 
 class UImage;
+class UOverlay;
 class UINV_EquippedSlottedItem;
 
 
@@ -33,4 +34,11 @@ private:
 	FGameplayTag EquipmentTypeTag;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Image_GreyedOutIcon;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> Overlay_Root;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<UINV_EquippedSlottedItem> EquippedSlottedItemClass;
+	TObjectPtr< UINV_EquippedSlottedItem> EquippedSlottedItem;
 };
