@@ -145,6 +145,18 @@ void UINV_InventoryComponent::Server_ConsumeItem_Implementation(UINV_InventoryIt
 
 }
 
+void UINV_InventoryComponent::Server_EquipSlotClicked_Implementation(UINV_InventoryItem* ItemToEquip, UINV_InventoryItem* ItemToUnequip)
+{
+	Multicast_EquipSlotClicked(ItemToEquip, ItemToUnequip);
+
+}
+
+void UINV_InventoryComponent::Multicast_EquipSlotClicked_Implementation(UINV_InventoryItem* ItemToEquip, UINV_InventoryItem* ItemToUnequip)
+{
+	OnItemEquipped.Broadcast(ItemToEquip);
+	OnItemUnequipped.Broadcast(ItemToUnequip);
+}
+
 void UINV_InventoryComponent::ToggleInventoryMenu()
 {
 	bInventoryMenuOpen ? CloseInventoryMenu() : OpenInventoryMenu();

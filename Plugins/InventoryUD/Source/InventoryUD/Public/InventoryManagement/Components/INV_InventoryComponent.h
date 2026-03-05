@@ -15,6 +15,8 @@ class UINV_ItemComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChange, UINV_InventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FINV_SlotAvailabilityResult&, Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged, UINV_InventoryItem*, Item);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class INVENTORYUD_API UINV_InventoryComponent : public UActorComponent
@@ -42,6 +44,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_ConsumeItem(UINV_InventoryItem* Item);
 
+	UFUNCTION(Server, Reliable)
+	void Server_EquipSlotClicked(UINV_InventoryItem* ItemToEquip, UINV_InventoryItem* ItemToUnequip);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_EquipSlotClicked(UINV_InventoryItem* ItemToEquip, UINV_InventoryItem* ItemToUnequip);
+
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventoryMenu();
 
@@ -55,6 +63,8 @@ public:
 	FInventoryItemChange OnItemRemoved; 
 	FNoRoomInInventory OnNoRoomInInventory;
 	FStackChange OnStackChange;
+	FItemEquipStatusChanged OnItemEquipped;
+	FItemEquipStatusChanged OnItemUnequipped;
 
 protected:
 	// Called when the game starts

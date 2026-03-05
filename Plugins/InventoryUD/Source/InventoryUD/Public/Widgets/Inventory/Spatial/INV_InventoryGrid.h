@@ -48,6 +48,7 @@ public:
 	bool HasHoverItem() const;
 
 	UINV_HoverItem* GetHoverItem();
+	void ClearHoverItem();
 
 private:
 
@@ -141,7 +142,7 @@ private:
 
 	void SwapStackCounts(const int32 ClickedStackCount, const int32 HoverStackCount, const int32 Index);
 
-	void ClearHoverItem();
+	
 
 	UUserWidget* GetVisibleCursorWidget();
 	UUserWidget* GetHiddenCursorWidget();

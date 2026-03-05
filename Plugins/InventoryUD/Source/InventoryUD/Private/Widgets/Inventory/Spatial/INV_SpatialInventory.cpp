@@ -6,6 +6,7 @@
 #include "Widgets/Inventory/GridSlots/INV_EquippedGridSlot.h"
 #include "Widgets/SlottedItems/INV_EquippedSlottedItem.h"
 #include "Widgets/Inventory/HoverItem/INV_HoverItem.h"
+#include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
@@ -56,8 +57,16 @@ void UINV_SpatialInventory::EquippedGridSlotClicked(UINV_EquippedGridSlot* Equip
 	);
 	EquippedSlottedItem->OnSlottedItemClicked.AddDynamic(this, &ThisClass::EquippedSlottedItemClicked);
 
-	//Clear Hover Item
 	//Tell server we are equipping something (do we need to unequip something as well? )
+
+	UINV_InventoryComponent* InventoryComponent = UINV_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+	check(IsValid(InventoryComponent));
+	InventoryComponent->Server_EquipSlotClicked(HoverItem->GetInventoryItem(), nullptr);
+
+	if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer) {
+		InventoryComponent->OnItemEquipped.Broadcast(HoverItem->GetInventoryItem());
+	}
+	GridEquippables->ClearHoverItem();
 }
 
 void UINV_SpatialInventory::EquippedSlottedItemClicked(UINV_EquippedSlottedItem* EquippedSlottedItem)
