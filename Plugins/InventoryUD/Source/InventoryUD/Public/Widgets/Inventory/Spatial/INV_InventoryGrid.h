@@ -50,14 +50,17 @@ public:
 	UINV_HoverItem* GetHoverItem();
 	void ClearHoverItem();
 	void AssignHoverItem(UINV_InventoryItem* InventoryItem);
+
+	void OnHide();
+
 private:
 
 	void ConstructGrid();
 
 	bool MatchesCategory(const UINV_InventoryItem* Item) const;
 
-	FINV_SlotAvailabilityResult HasRoomForItem(const UINV_InventoryItem* Item);
-	FINV_SlotAvailabilityResult HasRoomForItem(const FINV_ItemManifest& Manifest);
+	FINV_SlotAvailabilityResult HasRoomForItem(const UINV_InventoryItem* Item, const int32 StackAmountOverride = -1);
+	FINV_SlotAvailabilityResult HasRoomForItem(const FINV_ItemManifest& Manifest, const int32 StackAmountOverride = -1);
 
 	void AddItemToIndices(const FINV_SlotAvailabilityResult& AvailabilityResult, UINV_InventoryItem* NewItem);
 	void AddItemAtIndex(UINV_InventoryItem* Item, const int32 Index, const bool bStackable, const int32 StackAmount);
@@ -177,7 +180,10 @@ private:
 	UFUNCTION()
 	void OnPopUpMenuConsume(int32 Index);
 
-	
+	UFUNCTION()
+	void OnInventoryMenuToggled(bool bOpen);
+
+	void PutHoverItemBack();
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UUserWidget> VisibleCursorWidgetClass;

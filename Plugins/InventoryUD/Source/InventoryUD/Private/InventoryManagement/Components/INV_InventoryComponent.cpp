@@ -160,6 +160,7 @@ void UINV_InventoryComponent::Multicast_EquipSlotClicked_Implementation(UINV_Inv
 void UINV_InventoryComponent::ToggleInventoryMenu()
 {
 	bInventoryMenuOpen ? CloseInventoryMenu() : OpenInventoryMenu();
+	OnInventoryMenuToggled.Broadcast(bInventoryMenuOpen);
 }
 
 void UINV_InventoryComponent::AddRepSubObject(UObject* SubObj)
