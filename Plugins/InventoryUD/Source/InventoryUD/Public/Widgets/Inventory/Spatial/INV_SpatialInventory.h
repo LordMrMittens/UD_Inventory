@@ -103,4 +103,6 @@ private:
 	void ClearSlotOfItem(UINV_EquippedGridSlot* EquippedGridSlot);
 	void RemoveEquippedSlottedItem(UINV_EquippedSlottedItem* EquippedSlottedItem);
 	void MakeEquippedSlottedItem(UINV_EquippedSlottedItem* EquippedSlottedItem, UINV_EquippedGridSlot* EquippedGridSlot, UINV_InventoryItem* ItemToEquip);
+
+	void BroadcastSlotClickedDelegates(UINV_InventoryItem* ItemToEquip, UINV_InventoryItem* ItemToUnequip);
 };

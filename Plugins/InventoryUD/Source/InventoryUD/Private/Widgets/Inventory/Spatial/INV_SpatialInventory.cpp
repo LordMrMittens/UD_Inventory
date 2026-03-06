@@ -81,7 +81,7 @@ void UINV_SpatialInventory::EquippedSlottedItemClicked(UINV_EquippedSlottedItem*
 	ClearSlotOfItem(EquippedGridSlot);
 	RemoveEquippedSlottedItem(EquippedSlottedItem);
 	MakeEquippedSlottedItem(EquippedSlottedItem, EquippedGridSlot, ItemToEquip);
-	//broadcast any delegates needed
+	BroadcastSlotClickedDelegates(ItemToEquip, ItemToUnequip);
 }
 
 void UINV_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -271,5 +271,22 @@ void UINV_SpatialInventory::MakeEquippedSlottedItem(UINV_EquippedSlottedItem* Eq
 	if (!IsValid(EquippedGridSlot)) return;
 
 	UINV_EquippedSlottedItem* SlottedItem = EquippedGridSlot->OnItemEquipped(ItemToEquip, EquippedSlottedItem->GetEquipmentTypeTag(), UINV_InventoryStatics::GetInventoryWidget(GetOwningPlayer())->GetTileSize() );
-	SlottedItem->OnSlottedItemClicked.AddDynamic(this, &ThisClass::EquippedSlottedItemClicked);
+	if (IsValid(SlottedItem))
+	{
+		SlottedItem->OnSlottedItemClicked.AddDynamic(this, &ThisClass::EquippedSlottedItemClicked);
+	}
+	EquippedGridSlot->SetEquippedSlottedItem(SlottedItem);
+}
+
+void UINV_SpatialInventory::BroadcastSlotClickedDelegates(UINV_InventoryItem* ItemToEquip, UINV_InventoryItem* ItemToUnequip)
+{
+	UINV_InventoryComponent* InventoryComponent = UINV_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+	check(IsValid(InventoryComponent));
+
+	InventoryComponent->Server_EquipSlotClicked(ItemToEquip, ItemToUnequip);
+	if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer)
+	{
+		InventoryComponent->OnItemEquipped.Broadcast(ItemToEquip);
+		InventoryComponent->OnItemUnequipped.Broadcast(ItemToUnequip);
+	}
 }
