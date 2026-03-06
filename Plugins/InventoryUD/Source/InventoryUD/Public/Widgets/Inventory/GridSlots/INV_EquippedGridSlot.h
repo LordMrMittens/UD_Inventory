@@ -29,6 +29,7 @@ public:
 
 	FEquippedGridSlotClicked EquippedGridSlotClicked;
 
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Inventory", meta = (Categories = "GameItems.Equipment"))
 	FGameplayTag EquipmentTypeTag;
@@ -41,4 +42,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UINV_EquippedSlottedItem> EquippedSlottedItemClass;
 	TObjectPtr< UINV_EquippedSlottedItem> EquippedSlottedItem;
+
+public:
+
+	void SetEquippedSlottedItem(UINV_EquippedSlottedItem* Item) { EquippedSlottedItem = Item; }
+
 };

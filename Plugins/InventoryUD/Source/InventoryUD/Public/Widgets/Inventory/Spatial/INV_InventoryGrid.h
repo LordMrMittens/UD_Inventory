@@ -49,7 +49,7 @@ public:
 
 	UINV_HoverItem* GetHoverItem();
 	void ClearHoverItem();
-
+	void AssignHoverItem(UINV_InventoryItem* InventoryItem);
 private:
 
 	void ConstructGrid();
@@ -102,7 +102,7 @@ private:
 	bool IsRightClick(const FPointerEvent& MouseEvent) const;
 	bool IsLeftClick(const FPointerEvent& MouseEvent) const;
 	void PickUp(UINV_InventoryItem* ClickedItem, const int32 GridIndex);
-	void AssignHoverItem(UINV_InventoryItem* InventoryItem);
+	
 	void AssignHoverItem(UINV_InventoryItem* InventoryItem, const int32 GridIndex, const int32 PreviousGridIndex );
 	void RemoveItemFromGrid(UINV_InventoryItem* InventoryItem, const int32 GridIndex);
 	

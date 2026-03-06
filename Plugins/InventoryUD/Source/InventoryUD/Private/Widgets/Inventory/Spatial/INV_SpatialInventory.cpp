@@ -71,6 +71,17 @@ void UINV_SpatialInventory::EquippedGridSlotClicked(UINV_EquippedGridSlot* Equip
 
 void UINV_SpatialInventory::EquippedSlottedItemClicked(UINV_EquippedSlottedItem* EquippedSlottedItem)
 {
+	UINV_InventoryStatics::ItemUnhovered(GetOwningPlayer());
+	if (IsValid(GetHoverItem()) && GetHoverItem()->GetIsStackable()) return;
+
+	UINV_InventoryItem* ItemToEquip = IsValid(GetHoverItem()) ? GetHoverItem()->GetInventoryItem() : nullptr;
+	UINV_InventoryItem* ItemToUnequip = EquippedSlottedItem->GetInventoryItem();
+	UINV_EquippedGridSlot* EquippedGridSlot = FindSlotWithEquippedItem(ItemToUnequip);
+	GridEquippables->AssignHoverItem(ItemToUnequip);
+	ClearSlotOfItem(EquippedGridSlot);
+	RemoveEquippedSlottedItem(EquippedSlottedItem);
+	MakeEquippedSlottedItem(EquippedSlottedItem, EquippedGridSlot, ItemToEquip);
+	//broadcast any delegates needed
 }
 
 void UINV_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -226,4 +237,39 @@ bool UINV_SpatialInventory::CanEquipHoverItem(UINV_EquippedGridSlot* EquipGridSl
 	UINV_InventoryItem* HeldItem = HoverItem->GetInventoryItem();
 
 	return HasHoverItem() && IsValid(HeldItem) && !HoverItem->GetIsStackable() && HeldItem->GetItemManifest().GetItemCategory() == EINV_ItemCategory::Equippable;
+}
+
+UINV_EquippedGridSlot* UINV_SpatialInventory::FindSlotWithEquippedItem(UINV_InventoryItem* EquippedItem) const
+{
+	auto* FoundEquippedGridSlot = EquippedGridSlots.FindByPredicate([EquippedItem](UINV_EquippedGridSlot* GridSlot) {
+
+		return GridSlot->GetInventoryItem() == EquippedItem;
+		});
+	return FoundEquippedGridSlot ? *FoundEquippedGridSlot : nullptr;
+}
+
+void UINV_SpatialInventory::ClearSlotOfItem(UINV_EquippedGridSlot* EquippedGridSlot)
+{
+	if (!IsValid(EquippedGridSlot)) return;
+	EquippedGridSlot->SetEquippedSlottedItem(nullptr);
+	EquippedGridSlot->SetInventoryItem(nullptr);
+}
+
+void UINV_SpatialInventory::RemoveEquippedSlottedItem(UINV_EquippedSlottedItem* EquippedSlottedItem)
+{
+	if (!IsValid(EquippedSlottedItem)) return;
+
+	if (EquippedSlottedItem->OnSlottedItemClicked.IsAlreadyBound(this, &ThisClass::EquippedSlottedItemClicked)) {
+		EquippedSlottedItem->OnSlottedItemClicked.RemoveDynamic(this, &ThisClass::EquippedSlottedItemClicked);
+		EquippedSlottedItem->RemoveFromParent();
+	}
+
+}
+
+void UINV_SpatialInventory::MakeEquippedSlottedItem(UINV_EquippedSlottedItem* EquippedSlottedItem, UINV_EquippedGridSlot* EquippedGridSlot, UINV_InventoryItem* ItemToEquip)
+{
+	if (!IsValid(EquippedGridSlot)) return;
+
+	UINV_EquippedSlottedItem* SlottedItem = EquippedGridSlot->OnItemEquipped(ItemToEquip, EquippedSlottedItem->GetEquipmentTypeTag(), UINV_InventoryStatics::GetInventoryWidget(GetOwningPlayer())->GetTileSize() );
+	SlottedItem->OnSlottedItemClicked.AddDynamic(this, &ThisClass::EquippedSlottedItemClicked);
 }
