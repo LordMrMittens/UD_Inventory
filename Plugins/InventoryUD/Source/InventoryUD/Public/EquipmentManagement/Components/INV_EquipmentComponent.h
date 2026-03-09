@@ -8,7 +8,10 @@
 
 class UINV_InventoryComponent;
 class UINV_InventoryItem;
+class AINV_EquipActor;
 class USkeletalMeshComponent;
+struct FINV_EquipmentFragment;
+struct FINV_ItemManifest;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class INVENTORYUD_API UINV_EquipmentComponent : public UActorComponent
@@ -33,4 +36,8 @@ private:
 	void OnItemUnequipped(UINV_InventoryItem* EquippedItem);
 
 	void InitInventoryComponent();
+
+	AINV_EquipActor* SpawnEquippedActor(FINV_EquipmentFragment* EquipmentFragment, const FINV_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh);
+
+	TArray<TObjectPtr<AINV_EquipActor>> EquippedActors;
 };

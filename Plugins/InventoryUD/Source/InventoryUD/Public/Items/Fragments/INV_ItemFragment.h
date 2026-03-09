@@ -243,6 +243,10 @@ public:
 
 	AINV_EquipActor* SpawnAttachedActor(USkeletalMeshComponent* AttachMesh) const;
 	void DestroyAttachedActor();
+
+	FGameplayTag GetEquipmentType() const { return EquipmentType; }
+
+	void SetEquippedActor(AINV_EquipActor* EquipActor);
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Inventory", meta = (ExcludeBaseStruct))
@@ -255,5 +259,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	FName SocketAttachPoint{NAME_None};
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	FGameplayTag EquipmentType{FGameplayTag::EmptyTag};
 
 };

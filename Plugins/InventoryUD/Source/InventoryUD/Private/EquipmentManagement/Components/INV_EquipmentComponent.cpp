@@ -2,9 +2,11 @@
 
 
 #include "EquipmentManagement/Components/INV_EquipmentComponent.h"
+#include "EquipmentManagement/INV_EquipActor.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
 #include "Items/INV_InventoryItem.h"
+#include "Items/Manifest/INV_ItemManifest.h"
 #include "Items/Manifest/INV_ItemManifest.h"
 #include "Items/Fragments/INV_ItemFragment.h"
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
@@ -39,6 +41,14 @@ void UINV_EquipmentComponent::InitInventoryComponent()
 	}
 
 }
+AINV_EquipActor* UINV_EquipmentComponent::SpawnEquippedActor(FINV_EquipmentFragment* EquipmentFragment, const FINV_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh)
+{
+	AINV_EquipActor* SpawnedEquipActor = EquipmentFragment->SpawnAttachedActor(AttachMesh);
+	SpawnedEquipActor->SetEquipmentType(EquipmentFragment->GetEquipmentType());
+	SpawnedEquipActor->SetOwner(GetOwner());
+	EquipmentFragment->SetEquippedActor(SpawnedEquipActor);
+	return SpawnedEquipActor;
+}
 void UINV_EquipmentComponent::OnItemEquipped(UINV_InventoryItem* EquippedItem)
 {
 	if (!IsValid(EquippedItem)) return;
@@ -47,8 +57,11 @@ void UINV_EquipmentComponent::OnItemEquipped(UINV_InventoryItem* EquippedItem)
 	FINV_ItemManifest& ItemManifest = EquippedItem->GetItemManifestMutable();
 	FINV_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FINV_EquipmentFragment>();
 	if (!EquipmentFragment) return;
-
+	
 	EquipmentFragment->OnEquip(OwningPlayerController.Get());
+	if (!OwningSkeletalMesh.IsValid()) return;
+	AINV_EquipActor* SpawnedEquippedActor = SpawnEquippedActor(EquipmentFragment, ItemManifest, OwningSkeletalMesh.Get());
+	EquippedActors.Add(SpawnedEquippedActor);
 }
 
 void UINV_EquipmentComponent::OnItemUnequipped(UINV_InventoryItem* UnequippedItem)
