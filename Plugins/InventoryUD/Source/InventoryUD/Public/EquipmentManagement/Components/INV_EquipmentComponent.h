@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "INV_EquipmentComponent.generated.h"
 
 class UINV_InventoryComponent;
@@ -38,6 +39,9 @@ private:
 	void InitInventoryComponent();
 
 	AINV_EquipActor* SpawnEquippedActor(FINV_EquipmentFragment* EquipmentFragment, const FINV_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh);
-
+	UPROPERTY()
 	TArray<TObjectPtr<AINV_EquipActor>> EquippedActors;
+
+	AINV_EquipActor* FindEquippedActorByTag(const FGameplayTag& EquipmentTypeTag);
+	void RemoveEquippedActor(const FGameplayTag& EquipmentTypeTag);
 };
