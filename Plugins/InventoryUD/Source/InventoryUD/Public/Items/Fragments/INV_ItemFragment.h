@@ -9,6 +9,7 @@
 
 class APlayerController;
 class UINV_CompositeBase;
+class AINV_EquipActor;
 
 
 USTRUCT(BlueprintType)
@@ -235,12 +236,24 @@ struct FINV_EquipmentFragment : public FINV_InventoryItemFragment
 
 public:
 	bool bEquipped{ false };
+	virtual void Manifest() override;
 	void OnEquip(APlayerController* PlayerController);
 	void OnUnequip(APlayerController* PlayerController);
 	virtual void Assimilate(UINV_CompositeBase* Composite) const override;
+
+	AINV_EquipActor* SpawnAttachedActor(USkeletalMeshComponent* AttachMesh) const;
+	void DestroyAttachedActor();
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Inventory", meta = (ExcludeBaseStruct))
 	TArray<TInstancedStruct<FINV_EquipModifier>> EquipModifiers;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<AINV_EquipActor> EquipActorClass{ nullptr };
+
+	TWeakObjectPtr<AINV_EquipActor> EquippedActor{ nullptr };
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	FName SocketAttachPoint{NAME_None};
 
 };

@@ -5,6 +5,8 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
 #include "Items/INV_InventoryItem.h"
+#include "Items/Manifest/INV_ItemManifest.h"
+#include "Items/Fragments/INV_ItemFragment.h"
 #include "InventoryManagement/Components/INV_InventoryComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "InventoryManagement/Utils/INV_InventoryStatics.h"
@@ -39,10 +41,26 @@ void UINV_EquipmentComponent::InitInventoryComponent()
 }
 void UINV_EquipmentComponent::OnItemEquipped(UINV_InventoryItem* EquippedItem)
 {
+	if (!IsValid(EquippedItem)) return;
+	if (!OwningPlayerController->HasAuthority()) return;
+
+	FINV_ItemManifest& ItemManifest = EquippedItem->GetItemManifestMutable();
+	FINV_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FINV_EquipmentFragment>();
+	if (!EquipmentFragment) return;
+
+	EquipmentFragment->OnEquip(OwningPlayerController.Get());
 }
 
-void UINV_EquipmentComponent::OnItemUnequipped(UINV_InventoryItem* EquippedItem)
+void UINV_EquipmentComponent::OnItemUnequipped(UINV_InventoryItem* UnequippedItem)
 {
+	if (!IsValid(UnequippedItem)) return;
+	if (!OwningPlayerController->HasAuthority()) return;
+
+	FINV_ItemManifest& ItemManifest = UnequippedItem->GetItemManifestMutable();
+	FINV_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FINV_EquipmentFragment>();
+	if (!EquipmentFragment) return;
+
+	EquipmentFragment->OnUnequip(OwningPlayerController.Get());
 }
 
 

@@ -2,6 +2,7 @@
 
 
 #include "Items/Fragments/INV_ItemFragment.h"
+#include "EquipmentManagement/INV_EquipActor.h"
 #include "Widgets/Composite/INV_Leaf_Image.h"
 #include "Widgets/Composite/INV_Leaf_Text.h"
 #include "Widgets/Composite/INV_Leaf_LabeledValue.h"
@@ -110,7 +111,17 @@ void FINV_StrengthModifier::OnUnequip(APlayerController* PlayerController)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Item Unequipped Lost %f Strength"), GetValue()));
 }
 
-void FINV_EquipmentFragment::OnEquip(APlayerController* PlayerController) 
+void FINV_EquipmentFragment::Manifest()
+{
+	FINV_InventoryItemFragment::Manifest();
+	for (auto& Modifier : EquipModifiers)
+	{
+		auto& ModifierReference = Modifier.GetMutable();
+		ModifierReference.Manifest();
+	}
+}
+
+void FINV_EquipmentFragment::OnEquip(APlayerController* PlayerController)
 {
 	if (bEquipped) return;
 	bEquipped = true;
@@ -136,5 +147,22 @@ void FINV_EquipmentFragment::Assimilate(UINV_CompositeBase* Composite) const
 	for (const auto& Modifier : EquipModifiers) {
 		const auto& ModifierReference = Modifier.Get();
 		ModifierReference.Assimilate(Composite);
+	}
+}
+
+AINV_EquipActor* FINV_EquipmentFragment::SpawnAttachedActor(USkeletalMeshComponent* AttachMesh) const
+{
+	if (!IsValid(EquipActorClass)|| !IsValid(AttachMesh)) return nullptr;
+
+	AINV_EquipActor* SpawnedActor = AttachMesh->GetWorld()->SpawnActor<AINV_EquipActor>(EquipActorClass);
+	SpawnedActor->AttachToComponent(AttachMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketAttachPoint);
+	return SpawnedActor;
+}
+
+void FINV_EquipmentFragment::DestroyAttachedActor()
+{
+	if (EquippedActor.IsValid())
+	{
+		EquippedActor->Destroy();
 	}
 }
