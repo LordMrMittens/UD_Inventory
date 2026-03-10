@@ -17,16 +17,7 @@
 void UINV_EquipmentComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OwningPlayerController = Cast<APlayerController>(GetOwner());
-	if (OwningPlayerController.IsValid()) 
-	{
-		ACharacter* OwningCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn());
-		if (IsValid(OwningCharacter)) {
-			OwningSkeletalMesh = OwningCharacter->GetMesh();
-		}
-		InitInventoryComponent();
-	}
+	InitPlayerController();
 }
 
 void UINV_EquipmentComponent::InitInventoryComponent()
@@ -40,6 +31,28 @@ void UINV_EquipmentComponent::InitInventoryComponent()
 		InventoryComponent->OnItemUnequipped.AddDynamic(this, &ThisClass::OnItemUnequipped);
 	}
 
+}
+void UINV_EquipmentComponent::InitPlayerController()
+{
+	if (OwningPlayerController = Cast<APlayerController>(GetOwner()); OwningPlayerController.IsValid())
+	{
+		if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn()); IsValid(OwningCharacter)) {
+			OnPossesedPawnChanged(nullptr, OwningCharacter);
+		}
+		else
+		{
+			OwningPlayerController->OnPossessedPawnChanged.AddDynamic(this, &ThisClass::OnPossesedPawnChanged);
+		}
+		
+	}
+}
+
+void UINV_EquipmentComponent::OnPossesedPawnChanged(APawn* OldPawn, APawn* NewPawn)
+{
+	if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn()); IsValid(OwningCharacter)) {
+		OwningSkeletalMesh = OwningCharacter->GetMesh();
+	}
+	InitInventoryComponent();
 }
 AINV_EquipActor* UINV_EquipmentComponent::SpawnEquippedActor(FINV_EquipmentFragment* EquipmentFragment, const FINV_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh)
 {
@@ -64,6 +77,7 @@ void UINV_EquipmentComponent::RemoveEquippedActor(const FGameplayTag& EquipmentT
 		EquippedActor->Destroy();
 	}
 }
+
 void UINV_EquipmentComponent::OnItemEquipped(UINV_InventoryItem* EquippedItem)
 {
 	if (!IsValid(EquippedItem)) return;
