@@ -25,6 +25,14 @@ void UINV_EquipmentComponent::SetOwningSkeletalMesh(USkeletalMeshComponent* Skel
 	OwningSkeletalMesh = SkeletalMesh;
 }
 
+void UINV_EquipmentComponent::InitializeOwner(APlayerController* PlayerController)
+{
+	if (IsValid(PlayerController)) {
+		OwningPlayerController = PlayerController;
+	}
+	InitInventoryComponent();
+}
+
 void UINV_EquipmentComponent::InitInventoryComponent()
 {
 	InventoryComponent = UINV_InventoryStatics::GetInventoryComponent(OwningPlayerController.Get());
@@ -91,8 +99,11 @@ void UINV_EquipmentComponent::OnItemEquipped(UINV_InventoryItem* EquippedItem)
 	FINV_ItemManifest& ItemManifest = EquippedItem->GetItemManifestMutable();
 	FINV_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FINV_EquipmentFragment>();
 	if (!EquipmentFragment) return;
-	
-	EquipmentFragment->OnEquip(OwningPlayerController.Get());
+	if(!bIsProxy)
+	{
+		EquipmentFragment->OnEquip(OwningPlayerController.Get());
+	}
+
 	if (!OwningSkeletalMesh.IsValid()) return;
 	AINV_EquipActor* SpawnedEquippedActor = SpawnEquippedActor(EquipmentFragment, ItemManifest, OwningSkeletalMesh.Get());
 	EquippedActors.Add(SpawnedEquippedActor);
@@ -106,8 +117,10 @@ void UINV_EquipmentComponent::OnItemUnequipped(UINV_InventoryItem* UnequippedIte
 	FINV_ItemManifest& ItemManifest = UnequippedItem->GetItemManifestMutable();
 	FINV_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FINV_EquipmentFragment>();
 	if (!EquipmentFragment) return;
-
-	EquipmentFragment->OnUnequip(OwningPlayerController.Get());
+	if (!bIsProxy)
+	{
+		EquipmentFragment->OnUnequip(OwningPlayerController.Get());
+	}
 	RemoveEquippedActor(EquipmentFragment->GetEquipmentType());
 }
 

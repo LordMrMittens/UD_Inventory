@@ -22,6 +22,7 @@ class INVENTORYUD_API UINV_EquipmentComponent : public UActorComponent
 public:	
 
 	void SetOwningSkeletalMesh(USkeletalMeshComponent* SkeletalMesh);
+	void InitializeOwner(APlayerController* Playerontroller);
 	
 protected:
 	// Called when the game starts

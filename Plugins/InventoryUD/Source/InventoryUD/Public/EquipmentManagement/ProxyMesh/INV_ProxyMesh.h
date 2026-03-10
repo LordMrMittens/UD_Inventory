@@ -31,4 +31,8 @@ private:
 	//proxy mesh on inventory menu
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TObjectPtr<USkeletalMeshComponent> Mesh;
+
+	FTimerHandle TimerForNextTick;
+	void DelayedInitializeOwner();
+	void DelayedInitialization();
 };
