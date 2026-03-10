@@ -21,6 +21,8 @@ class INVENTORYUD_API UINV_EquipmentComponent : public UActorComponent
 
 public:	
 
+	void SetOwningSkeletalMesh(USkeletalMeshComponent* SkeletalMesh);
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -48,4 +50,11 @@ private:
 
 	UFUNCTION()
 	void OnPossesedPawnChanged(APawn* OldPawn, APawn* NewPawn);
+
+	bool bIsProxy{ false };
+
+
+public:
+
+	void SetIsProxy(bool bProxy) { bIsProxy = bProxy; }
 };

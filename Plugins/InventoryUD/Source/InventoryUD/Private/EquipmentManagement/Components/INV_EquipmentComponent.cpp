@@ -20,6 +20,11 @@ void UINV_EquipmentComponent::BeginPlay()
 	InitPlayerController();
 }
 
+void UINV_EquipmentComponent::SetOwningSkeletalMesh(USkeletalMeshComponent* SkeletalMesh)
+{
+	OwningSkeletalMesh = SkeletalMesh;
+}
+
 void UINV_EquipmentComponent::InitInventoryComponent()
 {
 	InventoryComponent = UINV_InventoryStatics::GetInventoryComponent(OwningPlayerController.Get());
