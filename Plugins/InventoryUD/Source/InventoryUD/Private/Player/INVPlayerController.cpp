@@ -109,4 +109,10 @@ void AINVPlayerController::ToggleInventoryMenu()
 {
 	if (!InventoryComponent.IsValid()) return;
 	InventoryComponent->ToggleInventoryMenu();
+	if (InventoryComponent->IsMenuOpen()) {
+		HUDWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	else {
+		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }

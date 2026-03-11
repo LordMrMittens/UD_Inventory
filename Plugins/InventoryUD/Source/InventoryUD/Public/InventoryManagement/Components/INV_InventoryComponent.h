@@ -57,7 +57,7 @@ public:
 	void AddRepSubObject(UObject* SubObj);
 
 	void SpawnDroppedItem(UINV_InventoryItem* Item, int32 StackCount);
-
+	
 
 
 	FInventoryItemChange OnItemAdded;
@@ -107,5 +107,5 @@ private:
 public:
 
 	UINV_InventoryBase* GetInventoryMenu() const { return InventoryMenu; }
-
+	bool IsMenuOpen() const { return bInventoryMenuOpen; }
 };
