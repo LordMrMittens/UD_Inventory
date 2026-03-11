@@ -35,4 +35,7 @@ private:
 	FTimerHandle TimerForNextTick;
 	void DelayedInitializeOwner();
 	void DelayedInitialization();
+
+public:
+	USkeletalMeshComponent* GetProxyMesh() const { return Mesh; }
 };

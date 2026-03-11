@@ -27,7 +27,7 @@ void AINV_ProxyMesh::BeginPlay()
 void AINV_ProxyMesh::DelayedInitializeOwner()
 {
 	UWorld* World = GetWorld();
-	if (IsValid(World))
+	if (!IsValid(World))
 	{
 		DelayedInitialization();
 		return;
