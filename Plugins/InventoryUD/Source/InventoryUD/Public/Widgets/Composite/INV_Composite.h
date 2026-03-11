@@ -18,4 +18,7 @@ public:
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UINV_CompositeBase>> Children;
+
+public:
+	TArray<UINV_CompositeBase*> GetChildren() { return Children; }
 };

@@ -60,7 +60,7 @@ void UINV_InventoryComponent::Server_AddNewItem_Implementation(UINV_ItemComponen
 
 void UINV_InventoryComponent::Server_AddStacksToItem_Implementation(UINV_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
-	const FGameplayTag& ItemType = IsValid(ItemComponent) ?  ItemComponent->GetItemManifest().GetItemType() : FGameplayTag::EmptyTag;
+	const FGameplayTag& ItemType = IsValid(ItemComponent) ?  ItemComponent->GetItemManifestMutable().GetItemType() : FGameplayTag::EmptyTag;
 	UINV_InventoryItem* Item = InventoryList.FindItemByType(ItemType);
 	if (!IsValid(Item)) return;
 	Item->SetTotalStackCount(Item->GetTotalStackCount() + StackCount);
@@ -72,7 +72,7 @@ void UINV_InventoryComponent::PickupOrUpdateStack(int32 Remainder, UINV_ItemComp
 	if (Remainder == 0) {
 		ItemComponent->PickedUp();
 	}
-	else if (FINV_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeMutable<FINV_StackableFragment>())
+	else if (FINV_StackableFragment* StackableFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeMutable<FINV_StackableFragment>())
 	{
 		StackableFragment->SetStackCount(Remainder);
 	}

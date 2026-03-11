@@ -37,4 +37,5 @@ private:
 public:
 	FORCEINLINE FString GetPickupMessage() const { return PickupMessage; }
 	FORCEINLINE FINV_ItemManifest GetItemManifest() const { return ItemManifest; }
+	FORCEINLINE FINV_ItemManifest& GetItemManifestMutable() { return ItemManifest; }
 };

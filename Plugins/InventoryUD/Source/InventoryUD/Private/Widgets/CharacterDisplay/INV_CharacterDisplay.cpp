@@ -23,10 +23,8 @@ void UINV_CharacterDisplay::NativeTick(const FGeometry& MyGeometry, float InDelt
 	if (!bIsDragging) return;
 	LastPosition = CurrentPosition;
 	CurrentPosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
-
 	const float HorizontalDelta = LastPosition.X - CurrentPosition.X;
-
-	if (!Mesh.IsValid()) return
+	if (!Mesh.IsValid()) return;
 		Mesh->AddRelativeRotation(FRotator(0, HorizontalDelta, 0));
 }
 
