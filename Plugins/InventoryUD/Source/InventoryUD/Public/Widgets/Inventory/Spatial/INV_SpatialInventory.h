@@ -72,6 +72,12 @@ private:
 	UPROPERTY()
 	TObjectPtr<UINV_ItemDescription> ItemDescription;
 
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TSubclassOf<UINV_ItemDescription> EquippedItemDescriptionClass;
+
+	UPROPERTY()
+	TObjectPtr<UINV_ItemDescription> EquippedItemDescription;
+
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	float ItemDescriptionDelay{ 0.5f };
